@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AIProvider } from '@/lib/ai/provider';
-import { BusinessState } from '@/lib/ai/types';
+import { InterviewState } from '@/lib/ai/types';
 
 const aiProvider = new AIProvider();
 
@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { action, state, validationChoice } = body as {
       action: 'get_validation_summary' | 'generate_report';
-      state: BusinessState;
+      state: InterviewState;
       validationChoice?: string;
     };
 
