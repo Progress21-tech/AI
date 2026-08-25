@@ -54,13 +54,13 @@ export interface Question {
   terminal?: boolean;
 }
 
-export type InterviewPhase = 
-  | 'orientation' 
-  | 'business_mapping' 
-  | 'operations' 
-  | 'problem_discovery' 
-  | 'problem_deep_dive' 
-  | 'validation' 
+export type InterviewPhase =
+  | 'orientation'
+  | 'business_mapping'
+  | 'operations'
+  | 'problem_discovery'
+  | 'problem_deep_dive'
+  | 'validation'
   | 'complete';
 
 export type TimeMode = 'normal' | 'focus' | 'deep_dive' | 'wrap_up';
@@ -174,6 +174,7 @@ export interface DiscoveryReport {
   id: string;
   interviewId: string;
   createdAt: string;
+  source?: 'ai' | 'fallback';
   executiveSummary: string;
   businessProfile: {
     industry: string;
@@ -215,5 +216,25 @@ export interface DiscoveryReport {
     rationale: string;
     recommendedExperiments: string[];
   }[];
+  recommendations?: AIRecommendation[];
+  implementationRoadmap?: {
+    immediateActions: string[];
+    shortTermActions: string[];
+    mediumTermActions: string[];
+    longTermOpportunities: string[];
+  };
   qualityScore?: number;
+}
+
+export interface AIRecommendation {
+  title: string;
+  type: string;
+  problemSolved: string;
+  evidence: string[];
+  whyItMatters: string;
+  expectedImpact: string;
+  priority: string;
+  implementationDifficulty: string;
+  suggestedApproach: string;
+  nextStep: string;
 }
