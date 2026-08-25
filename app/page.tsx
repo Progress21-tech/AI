@@ -69,7 +69,7 @@ export default function LandingPage() {
               <span>AI Agent Runtime</span>
             </div>
             <p className="text-xs text-subtle leading-relaxed">
-              GPT-5.6 Terra reasoning engine dictating phase, objective & time mode.
+              AI reasoning engine dictating phase, objective & time mode.
             </p>
           </div>
 
