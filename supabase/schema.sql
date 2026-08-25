@@ -1,143 +1,112 @@
--- AI Business Discovery Agent - Database Schema Migration
--- Supabase / PostgreSQL
+-- AI Business Discovery Agent - Company-First Supabase Schema
+-- V1: no authentication, no user table required, server-mediated access
 
--- 1. Organizations
-CREATE TABLE IF NOT EXISTS public.organizations (
+CREATE TABLE IF NOT EXISTS public.companies (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
-    industry TEXT DEFAULT 'Accounting',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+    slug TEXT UNIQUE,
+    industry TEXT,
+    website TEXT,
+    size TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 2. Users
-CREATE TABLE IF NOT EXISTS public.users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    organization_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    role TEXT DEFAULT 'Owner',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
--- 3. Interviews
 CREATE TABLE IF NOT EXISTS public.interviews (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    organization_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
-    user_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
-    status TEXT DEFAULT 'in_progress' CHECK (status IN ('in_progress', 'validation', 'completed')),
-    phase TEXT DEFAULT 'overview' CHECK (phase IN ('overview', 'team', 'operations', 'problem_detection', 'deep_dive', 'validation')),
-    started_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    completed_at TIMESTAMP WITH TIME ZONE,
-    estimated_duration INTEGER DEFAULT 15, -- in minutes
-    actual_duration INTEGER, -- in seconds
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+    company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+    respondent_name TEXT,
+    respondent_role TEXT,
+    respondent_email TEXT,
+    respondent_phone TEXT,
+    status TEXT NOT NULL DEFAULT 'in_progress' CHECK (status IN ('in_progress', 'completed', 'abandoned', 'analysis_pending', 'analyzed')),
+    current_question_id TEXT,
+    started_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    last_activity_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    completed_at TIMESTAMPTZ,
+    target_duration_seconds INTEGER NOT NULL DEFAULT 900,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 4. Questions
-CREATE TABLE IF NOT EXISTS public.questions (
+CREATE TABLE IF NOT EXISTS public.interview_questions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    interview_id UUID REFERENCES public.interviews(id) ON DELETE CASCADE NOT NULL,
+    interview_id UUID NOT NULL REFERENCES public.interviews(id) ON DELETE CASCADE,
+    question_key TEXT NOT NULL,
     question_text TEXT NOT NULL,
-    question_type TEXT NOT NULL CHECK (question_type IN ('single_choice', 'multiple_choice', 'short_text', 'open_ended')),
-    options JSONB DEFAULT '[]'::jsonb,
-    objective TEXT NOT NULL,
-    category TEXT NOT NULL,
-    phase TEXT NOT NULL,
-    sequence INTEGER NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+    question_type TEXT NOT NULL,
+    sequence_number INTEGER NOT NULL,
+    displayed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    answered_at TIMESTAMPTZ
 );
 
--- 5. Answers
 CREATE TABLE IF NOT EXISTS public.answers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    question_id UUID REFERENCES public.questions(id) ON DELETE CASCADE NOT NULL,
-    interview_id UUID REFERENCES public.interviews(id) ON DELETE CASCADE NOT NULL,
+    interview_id UUID NOT NULL REFERENCES public.interviews(id) ON DELETE CASCADE,
+    question_id UUID NOT NULL REFERENCES public.interview_questions(id) ON DELETE CASCADE,
     answer_text TEXT,
-    selected_options JSONB DEFAULT '[]'::jsonb,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+    answer_json JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 6. Business Facts (Structured State)
 CREATE TABLE IF NOT EXISTS public.business_facts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    interview_id UUID REFERENCES public.interviews(id) ON DELETE CASCADE NOT NULL,
+    interview_id UUID NOT NULL REFERENCES public.interviews(id) ON DELETE CASCADE,
     category TEXT NOT NULL,
     key TEXT NOT NULL,
-    value JSONB NOT NULL,
-    confidence FLOAT DEFAULT 1.0 NOT NULL,
+    value JSONB,
     source_answer_id UUID REFERENCES public.answers(id) ON DELETE SET NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 7. Workflows
-CREATE TABLE IF NOT EXISTS public.workflows (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    interview_id UUID REFERENCES public.interviews(id) ON DELETE CASCADE NOT NULL,
-    name TEXT NOT NULL,
-    description TEXT,
-    confidence FLOAT DEFAULT 0.8 NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
--- 8. Workflow Steps
-CREATE TABLE IF NOT EXISTS public.workflow_steps (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    workflow_id UUID REFERENCES public.workflows(id) ON DELETE CASCADE NOT NULL,
-    step_number INTEGER NOT NULL,
-    name TEXT NOT NULL,
-    responsible_role TEXT,
-    tool TEXT,
-    description TEXT,
-    pain_level INTEGER DEFAULT 0 CHECK (pain_level BETWEEN 0 AND 10),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
--- 9. Problems
 CREATE TABLE IF NOT EXISTS public.problems (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    interview_id UUID REFERENCES public.interviews(id) ON DELETE CASCADE NOT NULL,
+    interview_id UUID NOT NULL REFERENCES public.interviews(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
-    description TEXT NOT NULL,
-    category TEXT DEFAULT 'general',
-    severity INTEGER DEFAULT 5 CHECK (severity BETWEEN 1 AND 10),
-    frequency TEXT DEFAULT 'weekly' CHECK (frequency IN ('daily', 'weekly', 'monthly', 'quarterly', 'ad_hoc')),
-    time_impact TEXT DEFAULT 'medium',
-    financial_impact TEXT DEFAULT 'unknown',
-    customer_impact TEXT DEFAULT 'unknown',
-    solution_gap TEXT DEFAULT 'unknown',
-    confidence FLOAT DEFAULT 0.5 CHECK (confidence BETWEEN 0 AND 1),
-    status TEXT DEFAULT 'suspected' CHECK (status IN ('suspected', 'investigating', 'confirmed')),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+    description TEXT,
+    frequency TEXT,
+    severity INTEGER,
+    people_affected INTEGER,
+    time_impact_hours_per_week NUMERIC,
+    financial_impact NUMERIC,
+    current_solution TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 10. Problem Evidence
-CREATE TABLE IF NOT EXISTS public.problem_evidence (
+CREATE TABLE IF NOT EXISTS public.recommendations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    problem_id UUID REFERENCES public.problems(id) ON DELETE CASCADE NOT NULL,
-    answer_id UUID REFERENCES public.answers(id) ON DELETE CASCADE NOT NULL,
-    evidence TEXT NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+    interview_id UUID NOT NULL REFERENCES public.interviews(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    type TEXT NOT NULL,
+    problem_solved TEXT,
+    evidence JSONB,
+    why_it_matters TEXT,
+    expected_impact JSONB,
+    implementation_difficulty TEXT,
+    priority TEXT,
+    suggested_approach TEXT,
+    risks JSONB,
+    next_step TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 11. Reports
 CREATE TABLE IF NOT EXISTS public.reports (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    interview_id UUID REFERENCES public.interviews(id) ON DELETE CASCADE NOT NULL,
-    summary TEXT NOT NULL,
-    business_profile JSONB NOT NULL,
-    team_summary JSONB NOT NULL,
-    technology_summary JSONB NOT NULL,
-    workflow_summary JSONB NOT NULL,
-    problem_summary JSONB NOT NULL,
-    opportunity_summary JSONB NOT NULL,
-    quality_score INTEGER CHECK (quality_score BETWEEN 1 AND 5),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+    interview_id UUID NOT NULL REFERENCES public.interviews(id) ON DELETE CASCADE,
+    executive_summary TEXT,
+    business_snapshot JSONB,
+    major_problems JSONB,
+    opportunities JSONB,
+    roadmap JSONB,
+    raw_ai_output JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 12. Decision / Observability Logs
+-- Keep the current runtime server-managed artifacts for observability.
 CREATE TABLE IF NOT EXISTS public.decision_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    interview_id UUID REFERENCES public.interviews(id) ON DELETE CASCADE NOT NULL,
+    interview_id UUID NOT NULL REFERENCES public.interviews(id) ON DELETE CASCADE,
     phase TEXT NOT NULL,
     objective TEXT NOT NULL,
     reason_code TEXT NOT NULL,
@@ -145,19 +114,19 @@ CREATE TABLE IF NOT EXISTS public.decision_logs (
     confidence FLOAT DEFAULT 1.0,
     model_latency_ms INTEGER,
     token_usage JSONB DEFAULT '{}'::jsonb,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Row Level Security (RLS) policies
-ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.companies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.interviews ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.questions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.interview_questions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.answers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.business_facts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.workflows ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.workflow_steps ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.problems ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.problem_evidence ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.recommendations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.decision_logs ENABLE ROW LEVEL SECURITY;
+
+-- Default posture: server-side only access; no public blanket read/write policies.
+-- Create your app-specific policies in Supabase after validating the server-mediated flow.
+
