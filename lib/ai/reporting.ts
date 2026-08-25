@@ -56,6 +56,7 @@ export function generateDiscoveryReport(
         id: `rep-${state.interviewId}`,
         interviewId: state.interviewId,
         createdAt: new Date().toISOString(),
+        source: 'fallback',
         executiveSummary:
             correctionText ||
             `Interview completed with ${state.questionsAsked} questions. Primary focus area: ${topProblem?.title ?? 'Operational discovery'}. Validation choice: ${validationChoice ?? 'pending'}.`,
