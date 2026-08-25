@@ -3,8 +3,11 @@ import { createServerClient } from '@supabase/ssr';
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({ request });
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const key =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
   if (!url || !key) {
     return response;
@@ -13,20 +16,40 @@ export async function middleware(request: NextRequest) {
   const supabase = createServerClient(url, key, {
     cookies: {
       getAll: () => request.cookies.getAll(),
-      setAll: (items) => {
-        items.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+
+      setAll: (
+        items: {
+          name: string;
+          value: string;
+          options?: Parameters<typeof response.cookies.set>[2];
+        }[]
+      ) => {
+        items.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
       },
     },
   });
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const protectedPaths = ['/dashboard', '/admin'];
-  const isProtected = protectedPaths.some((path) => request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(`${path}/`));
+
+  const isProtected = protectedPaths.some(
+    (path) =>
+      request.nextUrl.pathname === path ||
+      request.nextUrl.pathname.startsWith(`${path}/`)
+  );
 
   if (isProtected && !user) {
     const redirectUrl = new URL('/sign-in', request.url);
-    redirectUrl.searchParams.set('next', request.nextUrl.pathname);
+    redirectUrl.searchParams.set(
+      'next',
+      request.nextUrl.pathname
+    );
+
     return NextResponse.redirect(redirectUrl);
   }
 
