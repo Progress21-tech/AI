@@ -1,2 +1,15 @@
-node_modules
-node_modules
+node_modules/
+
+# Next.js build output
+.next/
+
+# Local bundled Node runtime
+.node/
+
+# Local archives
+*.zip
+
+# Environment files
+.env
+.env.*
+!.env.example
