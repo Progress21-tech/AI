@@ -1,6 +1,58 @@
 // TypeScript Definitions for AI Business Discovery Agent - Runtime Phase
 
-export type QuestionType = 'single_choice' | 'multiple_choice' | 'short_text' | 'open_ended';
+export type QuestionType =
+  | 'single_choice'
+  | 'multi_choice'
+  | 'short_text'
+  | 'long_text'
+  | 'number'
+  | 'currency'
+  | 'percentage'
+  | 'yes_no'
+  | 'scale'
+  // Kept while older report/runtime code is phased out.
+  | 'multiple_choice'
+  | 'open_ended';
+
+export type ConditionOperator =
+  | 'equals'
+  | 'not_equals'
+  | 'contains'
+  | 'not_contains'
+  | 'greater_than'
+  | 'less_than';
+
+export interface Condition {
+  questionId: string;
+  operator: ConditionOperator;
+  value: unknown;
+}
+
+export interface QuestionOption {
+  value: string;
+  label: string;
+  score?: number;
+  tags?: string[];
+}
+
+export interface Question {
+  id: string;
+  category: string;
+  subcategory?: string;
+  text: string;
+  type: Exclude<QuestionType, 'multiple_choice' | 'open_ended'>;
+  required?: boolean;
+  options?: QuestionOption[];
+  placeholder?: string;
+  helpText?: string;
+  order: number;
+  conditions?: Condition[];
+  tags?: string[];
+  purpose?: string;
+  priority?: number;
+  deepDive?: boolean;
+  terminal?: boolean;
+}
 
 export type InterviewPhase = 
   | 'orientation' 
@@ -23,6 +75,8 @@ export interface QuestionObject {
   category: string;
   phase: InterviewPhase;
   sequence: number;
+  placeholder?: string;
+  helpText?: string;
 }
 
 export interface AnswerRecord {
@@ -85,6 +139,12 @@ export interface InterviewState {
   elapsedSeconds: number;
   estimatedRemainingSeconds: number;
   timeMode: TimeMode;
+  companyId?: string;
+  answers?: AnswerRecord[];
+  askedQuestionIds?: string[];
+  diagnosticSignals?: string[];
+  selectedProcesses?: string[];
+  currentQuestionDbId?: string;
 }
 
 export interface AgentDecisionContract {

@@ -80,7 +80,7 @@ export const AnswerInputs: React.FC<AnswerInputsProps> = ({
   }
 
   // 2. Multiple Choice (PRD Section 10.2)
-  if (type === 'multiple_choice') {
+  if (type === 'multiple_choice' || type === 'multi_choice') {
     return (
       <form onSubmit={handleMultiSubmit} className="flex flex-col gap-3 w-full mt-4">
         {options.map((option, idx) => {
@@ -121,11 +121,11 @@ export const AnswerInputs: React.FC<AnswerInputsProps> = ({
   }
 
   // 3. Short Text / Numeric (PRD Section 10.3)
-  if (type === 'short_text') {
+  if (type === 'short_text' || type === 'number' || type === 'currency' || type === 'percentage') {
     return (
       <form onSubmit={handleTextSubmit} className="flex flex-col gap-3 w-full mt-4">
         <input
-          type="text"
+          type={type === 'number' || type === 'currency' || type === 'percentage' ? 'number' : 'text'}
           value={textInput}
           onChange={(e) => setTextInput(e.target.value)}
           placeholder="Type your answer here..."
@@ -144,7 +144,15 @@ export const AnswerInputs: React.FC<AnswerInputsProps> = ({
     );
   }
 
-  // 4. Open Ended (PRD Section 10.4)
+  if (type === 'yes_no') {
+    return <div className="flex gap-3 w-full mt-4">{['Yes', 'No'].map((option) => <button key={option} type="button" disabled={disabled} onClick={() => onSubmit(option, [option])} className="flex-1 rounded-xl bg-black px-4 py-3.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-40">{option}</button>)}</div>;
+  }
+
+  if (type === 'scale') {
+    return <div className="grid grid-cols-5 gap-2 w-full mt-4">{[1, 2, 3, 4, 5].map((value) => <button key={value} type="button" disabled={disabled} onClick={() => onSubmit(String(value), [String(value)])} className="rounded-xl border border-borderDark bg-white px-3 py-4 text-sm font-semibold hover:bg-black hover:text-white disabled:opacity-40">{value}</button>)}</div>;
+  }
+
+  // 4. Long text
   return (
     <form onSubmit={handleTextSubmit} className="flex flex-col gap-3 w-full mt-4">
       <textarea

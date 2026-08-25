@@ -67,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
           <div>
             <h1 className="text-sm font-semibold tracking-tight text-black">Business Discovery Agent</h1>
-            <p className="text-xs text-subtle font-mono">Realtime Adaptive Runtime</p>
+          <p className="text-xs text-subtle font-mono">{questionCount} questions answered</p>
           </div>
         </div>
 

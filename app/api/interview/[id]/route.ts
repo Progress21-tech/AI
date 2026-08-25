@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 const patchInterviewSchema = z.object({
     status: z.enum(['in_progress', 'completed', 'abandoned', 'analysis_pending', 'analyzed']).optional(),
@@ -20,11 +21,17 @@ export async function GET(
         return NextResponse.json({ error: 'Missing interview ID' }, { status: 400 });
     }
 
+    const supabase = await createServerSupabaseClient();
+    const record = supabase ? await supabase.from('interviews').select('company_id, status, current_question_id, started_at, last_activity_at, target_duration_seconds').eq('id', id).maybeSingle() : null;
+    if (supabase && !record?.data) return NextResponse.json({ error: 'Interview not found' }, { status: 404 });
     return NextResponse.json({
-        success: true,
-        interviewId: id,
-        status: 'in_progress',
-        companyId: null,
+      success: true,
+      interviewId: id,
+        status: record?.data?.status ?? 'in_progress',
+        companyId: record?.data?.company_id ?? null,
+        currentQuestionId: record?.data?.current_question_id ?? null,
+        startedAt: record?.data?.started_at ?? null,
+        lastActivityAt: record?.data?.last_activity_at ?? null,
     });
 }
 

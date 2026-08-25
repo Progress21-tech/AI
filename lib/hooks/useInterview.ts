@@ -145,7 +145,6 @@ export function useInterview(interviewIdFromParam?: string) {
         body: JSON.stringify({
           state,
           answer: answerRecord,
-          recentAnswers: updatedAnswers,
         }),
       });
 
@@ -156,7 +155,7 @@ export function useInterview(interviewIdFromParam?: string) {
       const data = await res.json();
       const decision: AgentDecisionContract = data.decision;
 
-      const newState: InterviewState = {
+      const newState: InterviewState = data.state ?? {
         ...state,
         phase: decision.phase,
         timeMode: decision.timeMode,
@@ -167,7 +166,7 @@ export function useInterview(interviewIdFromParam?: string) {
 
       setState(newState);
 
-      if (decision.action === 'validate_summary' || newState.questionsAsked >= 8) {
+      if (decision.action === 'validate_summary' || decision.action === 'finish_interview') {
         fetchValidationSummary(newState);
       } else {
         setCurrentQuestion(decision.question);

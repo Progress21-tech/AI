@@ -1,127 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { runAgent } from '@/lib/agent/runtime';
 import { InterviewState } from '@/lib/ai/types';
+import { getInitialQuestion } from '@/lib/interview/engine';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 
-const startInterviewSchema = z.object({
-  companyName: z.string().trim().min(2).max(200),
-  respondentName: z.string().trim().max(150).optional().transform((value) => value || undefined),
-  respondentRole: z.string().trim().max(150).optional().transform((value) => value || undefined),
-  respondentEmail: z.string().trim().email().max(254).optional().transform((value) => value || undefined),
-  respondentPhone: z.string().trim().max(40).optional().transform((value) => value || undefined),
-});
-
-async function ensureCompanyRecord(payload: {
-  companyName: string;
-  respondentName?: string;
-  respondentRole?: string;
-  respondentEmail?: string;
-  respondentPhone?: string;
-}) {
-  const supabase = await createServerSupabaseClient();
-
-  if (!supabase) {
-    return { companyId: `local-company-${Date.now()}` };
-  }
-
-  const normalizedName = payload.companyName.trim();
-  const normalizedSlug = normalizedName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 80) || 'company';
-
-  const { data: existingCompany } = await supabase
-    .from('companies')
-    .select('id, name')
-    .ilike('name', normalizedName)
-    .limit(1)
-    .maybeSingle();
-
-  if (existingCompany) {
-    return { companyId: existingCompany.id };
-  }
-
-  const { data: createdCompany, error } = await supabase
-    .from('companies')
-    .insert({
-      name: normalizedName,
-      slug: normalizedSlug,
-      industry: null,
-      website: null,
-      size: null,
-    })
-    .select('id')
-    .single();
-
-  if (error || !createdCompany) {
-    return { companyId: `local-company-${Date.now()}` };
-  }
-
-  return { companyId: createdCompany.id };
-}
+const schema = z.object({ companyName: z.string().trim().min(2).max(200), respondentName: z.string().trim().max(150).optional(), respondentRole: z.string().trim().max(150).optional(), respondentEmail: z.string().trim().email().max(254).optional(), respondentPhone: z.string().trim().max(40).optional() });
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const payload = startInterviewSchema.parse(body);
-
-    const companyRecord = await ensureCompanyRecord(payload);
+    const payload = schema.parse(await req.json());
     const interviewId = crypto.randomUUID();
-    const nowISO = new Date().toISOString();
-
-    const initialState: InterviewState = {
-      interviewId,
-      phase: 'orientation',
-      businessFacts: [],
-      workflows: [],
-      problems: [],
-      unknowns: [],
-      currentObjective: 'establish_business_context',
-      questionsAsked: 1,
-      startedAt: nowISO,
-      lastActivityAt: nowISO,
-      targetDurationSeconds: 720,
-      elapsedSeconds: 0,
-      estimatedRemainingSeconds: 720,
-      timeMode: 'normal',
-    };
-
-    const { response, updatedState } = await runAgent(initialState);
-
-    return NextResponse.json({
-      success: true,
-      interviewId,
-      companyId: companyRecord.companyId,
-      state: updatedState,
-      decision: {
-        action: response.action,
-        phase: response.phase,
-        objective: response.objective,
-        timeMode: response.timer.mode,
-        question: response.question ? {
-          id: 'q-1',
-          text: response.question.text,
-          type: response.question.type,
-          options: response.question.options,
-          required: true,
-          objective: response.objective,
-          category: response.phase,
-          phase: response.phase,
-          sequence: 1,
-        } : null,
-        confidence: response.confidence,
-      },
-    });
-  } catch (error: any) {
-    console.error('Error in /api/interview/start:', error);
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Company name is required and must be valid.', details: error.flatten() },
-        { status: 400 }
-      );
+    const now = new Date().toISOString();
+    const supabase = await createServerSupabaseClient();
+    let companyId = `local-company-${Date.now()}`;
+    if (supabase) {
+      const slug = payload.companyName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 80) || 'company';
+      const { data: company } = await supabase.from('companies').insert({ name: payload.companyName, slug: `${slug}-${Date.now()}` }).select('id').single();
+      if (company) companyId = company.id;
+      await supabase.from('interviews').insert({ id: interviewId, company_id: companyId, respondent_name: payload.respondentName, respondent_role: payload.respondentRole, respondent_email: payload.respondentEmail, respondent_phone: payload.respondentPhone, current_question_id: 'company_name', started_at: now, last_activity_at: now, target_duration_seconds: 900 });
+      await supabase.from('interview_questions').insert({ interview_id: interviewId, question_key: 'company_name', question_text: getInitialQuestion().text, question_type: getInitialQuestion().type, sequence_number: 1 });
     }
-
-    return NextResponse.json(
-      { error: 'Failed to start discovery interview', details: error.message },
-      { status: 500 }
-    );
+    const state: InterviewState = { interviewId, companyId, phase: 'orientation', businessFacts: [], workflows: [], problems: [], unknowns: [], currentObjective: 'business_identity', questionsAsked: 0, startedAt: now, lastActivityAt: now, targetDurationSeconds: 900, elapsedSeconds: 0, estimatedRemainingSeconds: 900, timeMode: 'normal', answers: [], askedQuestionIds: ['company_name'], diagnosticSignals: [], selectedProcesses: [] };
+    return NextResponse.json({ success: true, interviewId, companyId, state, decision: { action: 'ask_question', phase: 'orientation', objective: 'business_identity', timeMode: 'normal', question: getInitialQuestion(), confidence: 1 } });
+  } catch (error: any) {
+    return NextResponse.json({ error: error instanceof z.ZodError ? 'Company name is required and must be valid.' : error.message || 'Failed to start discovery interview' }, { status: 400 });
   }
 }
