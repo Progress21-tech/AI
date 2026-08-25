@@ -17,7 +17,7 @@ export default function LandingPage() {
         </div>
 
         <Link
-          href="/interview/new"
+          href="/discovery"
           className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-black text-white text-xs font-medium hover:opacity-90 transition-opacity"
         >
           <span>Start Discovery</span>
@@ -25,11 +25,11 @@ export default function LandingPage() {
         </Link>
       </header>
 
-      {/* Hero Content (PRD Section 6.1) */}
+      {/* Hero Content (PRD Section 4 Migration) */}
       <main className="w-full max-w-4xl mx-auto px-6 py-12 flex flex-col items-center text-center gap-8 my-auto">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-borderDark text-xs font-mono text-subtle">
           <Sparkles className="w-3.5 h-3.5 text-black" />
-          <span>Adaptive AI Interviewer — Version 1.0</span>
+          <span>Realtime Adaptive Agent Runtime — v1.0</span>
         </div>
 
         <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-black max-w-3xl leading-[1.15]">
@@ -43,7 +43,7 @@ export default function LandingPage() {
         {/* Start CTA */}
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full max-w-sm mt-2">
           <Link
-            href="/interview/new"
+            href="/discovery"
             className="w-full py-4 rounded-2xl bg-black text-white text-sm font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-black/5"
           >
             <span>Start Discovery Interview</span>
@@ -51,7 +51,7 @@ export default function LandingPage() {
           </Link>
         </div>
 
-        {/* Key Details Cards (PRD Section 6.1) */}
+        {/* Key Details Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl mt-8 text-left">
           <div className="p-5 rounded-2xl bg-surface border border-borderDark flex flex-col gap-2">
             <div className="flex items-center gap-2 text-black font-bold text-xs uppercase tracking-wider font-mono">
@@ -59,17 +59,17 @@ export default function LandingPage() {
               <span>10–15 Minutes</span>
             </div>
             <p className="text-xs text-subtle leading-relaxed">
-              Short, high-value one-question-at-a-time conversation.
+              One-question-at-a-time conversation with adaptive time budget.
             </p>
           </div>
 
           <div className="p-5 rounded-2xl bg-surface border border-borderDark flex flex-col gap-2">
             <div className="flex items-center gap-2 text-black font-bold text-xs uppercase tracking-wider font-mono">
               <BrainCircuit className="w-4 h-4 text-black" />
-              <span>Adaptive Reasoning</span>
+              <span>AI Agent Runtime</span>
             </div>
             <p className="text-xs text-subtle leading-relaxed">
-              No static forms. Questions adapt dynamically based on your answers.
+              GPT-5.6 Terra reasoning engine dictating phase, objective & time mode.
             </p>
           </div>
 

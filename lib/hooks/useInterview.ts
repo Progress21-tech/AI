@@ -1,59 +1,68 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
-  BusinessState, 
+  InterviewState, 
   QuestionObject, 
   AnswerRecord, 
-  AIReasoningResult, 
+  AgentDecisionContract, 
   ValidationSummary, 
   DiscoveryReport 
 } from '@/lib/ai/types';
 
-const LOCAL_STORAGE_KEY = 'agy_business_discovery_state';
+const LOCAL_STORAGE_KEY = 'agy_agent_runtime_state';
 
-const initialBusinessState: BusinessState = {
-  business: {},
-  team: {},
-  technology: {},
-  workflows: {},
-  problems: [],
-  unknowns: [],
-  interviewPhase: 'overview',
-  questionCount: 0,
-  startTime: new Date().toISOString(),
-  estimatedRemainingMinutes: 12,
-};
-
-const initialQuestion: QuestionObject = {
-  id: 'q-0',
-  text: 'What primary industry or type of business do you operate?',
-  type: 'single_choice',
-  options: [
-    'Accounting & Tax Services',
-    'Legal / Advisory Firm',
-    'Logistics & Freight',
-    'Healthcare / Clinic',
-    'Manufacturing / Distribution',
-    'Other Professional Services'
-  ],
-  required: true,
-  objective: 'establish_business_context',
-  category: 'business_overview',
-  phase: 'overview',
-  sequence: 0,
-};
-
-export function useInterview() {
-  const [state, setState] = useState<BusinessState>(initialBusinessState);
-  const [currentQuestion, setCurrentQuestion] = useState<QuestionObject>(initialQuestion);
+export function useInterview(interviewIdFromParam?: string) {
+  const [state, setState] = useState<InterviewState | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<QuestionObject | null>(null);
   const [recentAnswers, setRecentAnswers] = useState<AnswerRecord[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [validationSummary, setValidationSummary] = useState<ValidationSummary | null>(null);
   const [report, setReport] = useState<DiscoveryReport | null>(null);
 
-  // Load persisted state on mount (PRD Section 37)
+  /**
+   * Initializes a new discovery interview session
+   */
+  const startNewInterview = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/interview/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!res.ok) throw new Error('Failed to initialize discovery interview session.');
+
+      const data = await res.json();
+      const newState: InterviewState = data.state;
+      const decision: AgentDecisionContract = data.decision;
+
+      setState(newState);
+      setCurrentQuestion(decision.question);
+      setRecentAnswers([]);
+      setValidationSummary(null);
+      setReport(null);
+
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({
+        state: newState,
+        currentQuestion: decision.question,
+        recentAnswers: []
+      }));
+
+      return newState.interviewId;
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Session start failed');
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Sync state on load
   useEffect(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -66,36 +75,41 @@ export function useInterview() {
         if (parsed.report) setReport(parsed.report);
       }
     } catch (e) {
-      console.warn('Could not read saved interview state:', e);
+      console.warn('Could not restore local state:', e);
     }
   }, []);
 
-  // Persist state to localStorage on update
+  // Save state updates to localStorage
   useEffect(() => {
-    try {
-      localStorage.setItem(
-        LOCAL_STORAGE_KEY,
-        JSON.stringify({
-          state,
-          currentQuestion,
-          recentAnswers,
-          validationSummary,
-          report,
-        })
-      );
-    } catch (e) {
-      console.warn('Could not save interview state:', e);
+    if (state && currentQuestion) {
+      try {
+        localStorage.setItem(
+          LOCAL_STORAGE_KEY,
+          JSON.stringify({
+            state,
+            currentQuestion,
+            recentAnswers,
+            validationSummary,
+            report,
+          })
+        );
+      } catch (e) {
+        console.warn('Failed to save state:', e);
+      }
     }
   }, [state, currentQuestion, recentAnswers, validationSummary, report]);
 
   /**
-   * Submit an answer for the active question
+   * Submits user answer, persists before requesting next step
    */
   const submitAnswer = async (answerText?: string, selectedOptions?: string[]) => {
+    if (!state || !currentQuestion) return;
+
     setIsLoading(true);
     setError(null);
 
     const answerRecord: AnswerRecord = {
+      id: `ans-${Date.now()}`,
       questionId: currentQuestion.id,
       questionText: currentQuestion.text,
       answerText,
@@ -107,7 +121,7 @@ export function useInterview() {
     setRecentAnswers(updatedAnswers);
 
     try {
-      const res = await fetch('/api/interview', {
+      const res = await fetch('/api/interview/answer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -122,39 +136,23 @@ export function useInterview() {
       }
 
       const data = await res.json();
-      const reasoning: AIReasoningResult = data.result;
+      const decision: AgentDecisionContract = data.decision;
 
-      // Update phase & count
-      const newState: BusinessState = {
+      const newState: InterviewState = {
         ...state,
-        interviewPhase: reasoning.phase,
-        questionCount: state.questionCount + 1,
-        estimatedRemainingMinutes: Math.max(1, 14 - state.questionCount),
+        phase: decision.phase,
+        timeMode: decision.timeMode,
+        questionsAsked: state.questionsAsked + 1,
+        elapsedSeconds: data.updatedTimeMetrics?.elapsedSeconds || state.elapsedSeconds,
+        estimatedRemainingSeconds: data.updatedTimeMetrics?.estimatedRemainingSeconds || state.estimatedRemainingSeconds,
       };
-
-      // Merge facts & problems
-      if (reasoning.extractedFacts) {
-        reasoning.extractedFacts.forEach((f) => {
-          if (f.key === 'industry') newState.business.industry = f.value;
-          if (f.key === 'employeeCount') newState.business.employeeCount = f.value;
-        });
-      }
-
-      if (reasoning.detectedProblems) {
-        reasoning.detectedProblems.forEach((p) => {
-          const idx = newState.problems.findIndex((ep) => ep.title.toLowerCase() === p.title.toLowerCase());
-          if (idx >= 0) newState.problems[idx] = { ...newState.problems[idx], ...p };
-          else newState.problems.push(p);
-        });
-      }
 
       setState(newState);
 
-      // Check for validation transition
-      if (reasoning.action === 'validate_summary' || newState.questionCount >= 8) {
+      if (decision.action === 'validate_summary' || newState.questionsAsked >= 8) {
         fetchValidationSummary(newState);
       } else {
-        setCurrentQuestion(reasoning.question);
+        setCurrentQuestion(decision.question);
       }
     } catch (err: any) {
       console.error(err);
@@ -164,16 +162,13 @@ export function useInterview() {
     }
   };
 
-  /**
-   * Fetch validation summary before report generation
-   */
-  const fetchValidationSummary = async (targetState: BusinessState) => {
+  const fetchValidationSummary = async (targetState: InterviewState) => {
     try {
-      const res = await fetch('/api/report', {
+      const res = await fetch('/api/interview/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'get_validation_summary',
+          action: 'get_validation',
           state: targetState,
         }),
       });
@@ -182,19 +177,17 @@ export function useInterview() {
         setValidationSummary(data.summary);
       }
     } catch (e) {
-      console.error('Validation summary fetch failed:', e);
+      console.error('Validation fetch error:', e);
     }
   };
 
-  /**
-   * Generate final report upon human validation
-   */
   const generateReport = async (validationChoice: string, correctionText?: string) => {
+    if (!state) return;
     setIsLoading(true);
     setError(null);
 
     try {
-      const res = await fetch('/api/report', {
+      const res = await fetch('/api/interview/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -208,23 +201,13 @@ export function useInterview() {
       const data = await res.json();
       if (data.report) {
         setReport(data.report);
-        setState((prev) => ({ ...prev, interviewPhase: 'completed' }));
+        setState((prev) => prev ? ({ ...prev, phase: 'complete' }) : null);
       }
     } catch (err: any) {
       setError('Report generation failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const restartInterview = () => {
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
-    setState(initialBusinessState);
-    setCurrentQuestion(initialQuestion);
-    setRecentAnswers([]);
-    setValidationSummary(null);
-    setReport(null);
-    setError(null);
   };
 
   return {
@@ -235,8 +218,8 @@ export function useInterview() {
     error,
     validationSummary,
     report,
+    startNewInterview,
     submitAnswer,
     generateReport,
-    restartInterview,
   };
 }
