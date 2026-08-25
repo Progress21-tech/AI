@@ -17,10 +17,10 @@ export default function LandingPage() {
         </div>
 
         <Link
-          href="/discovery"
+          href="/sign-in"
           className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-black text-white text-xs font-medium hover:opacity-90 transition-opacity"
         >
-          <span>Start Discovery</span>
+          <span>Sign in</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </header>
@@ -43,10 +43,10 @@ export default function LandingPage() {
         {/* Start CTA */}
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full max-w-sm mt-2">
           <Link
-            href="/discovery"
+            href="/sign-up"
             className="w-full py-4 rounded-2xl bg-black text-white text-sm font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-black/5"
           >
-            <span>Start Discovery Interview</span>
+            <span>Create your account</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

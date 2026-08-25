@@ -1,0 +1,4 @@
+import Link from 'next/link';
+import { requireAdmin } from '@/lib/auth/server';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
+export default async function AdminCompaniesPage() { await requireAdmin(); const supabase = await createServerSupabaseClient(); const { data: companies = [] } = supabase ? await supabase.from('companies').select('id,name,industry,owner_id,created_at').order('created_at', { ascending: false }) : { data: [] }; return <main className="min-h-screen bg-white p-6 text-black"><div className="mx-auto max-w-5xl"><h1 className="mb-6 text-3xl font-bold">Companies</h1><div className="space-y-3">{companies.map((company) => <Link key={company.id} href={`/admin/companies/${company.id}`} className="block rounded-2xl border border-borderDark p-5 hover:bg-surface"><strong>{company.name}</strong><p className="text-sm text-subtle">{company.industry || 'No industry'} · Owner {company.owner_id}</p></Link>)}</div></div></main>; }

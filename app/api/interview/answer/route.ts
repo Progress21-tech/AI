@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AnswerRecord, InterviewState } from '@/lib/ai/types';
 import { buildAnalysisPayload, diagnosticSignals, getNextQuestion, isComplete } from '@/lib/interview/engine';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getAuthContext } from '@/lib/auth/server';
 
 export async function POST(req: NextRequest) {
   try {
     const { state, answer } = await req.json() as { state: InterviewState; answer: AnswerRecord };
     if (!state || !answer) return NextResponse.json({ error: 'Missing interview state or answer' }, { status: 400 });
+    const auth = await getAuthContext();
+    if (!auth) return NextResponse.json({ error: 'Authentication is required.' }, { status: 401 });
     const now = new Date();
     const elapsedSeconds = Math.max(0, Math.round((now.getTime() - new Date(state.startedAt).getTime()) / 1000));
     const answers = [...(state.answers ?? []), answer];
@@ -22,7 +25,10 @@ export async function POST(req: NextRequest) {
     if (next) updatedState.askedQuestionIds = [...(updatedState.askedQuestionIds ?? []), next.id];
     updatedState.phase = complete ? 'validation' : next?.phase ?? 'validation';
     const supabase = await createServerSupabaseClient();
-    if (supabase) {
+    if (!supabase) return NextResponse.json({ error: 'Supabase is not configured.' }, { status: 503 });
+    {
+      const { data: interview } = await supabase.from('interviews').select('id').eq('id', state.interviewId).maybeSingle();
+      if (!interview) return NextResponse.json({ error: 'Interview not found or not authorized.' }, { status: 404 });
       const { data: snapshot } = await supabase.from('interview_questions').select('id').eq('interview_id', state.interviewId).eq('question_key', answer.questionId).order('sequence_number', { ascending: false }).limit(1).maybeSingle();
       if (snapshot) await supabase.from('answers').insert({ interview_id: state.interviewId, question_id: snapshot.id, answer_text: answer.answerText ?? null, answer_json: { selectedOptions: answer.selectedOptions ?? [] } });
       await supabase.from('business_facts').insert(signals.map((signal) => ({ interview_id: state.interviewId, category: 'diagnostic_signal', key: signal, value: true })));

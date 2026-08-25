@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateDiscoveryReport, generateValidationSummary } from '@/lib/ai/reporting';
 import { InterviewState } from '@/lib/ai/types';
+import { getAuthContext } from '@/lib/auth/server';
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await getAuthContext();
+    if (!auth) return NextResponse.json({ error: 'Authentication is required.' }, { status: 401 });
     const body = await req.json();
     const { action, state, validationChoice } = body as {
       action: 'get_validation_summary' | 'generate_report';
