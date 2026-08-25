@@ -1,30 +1,29 @@
-import { createServerClient, type SetAllCookies } from '@supabase/ssr';
+import 'server-only';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-
-type CookiesToSet = Parameters<SetAllCookies>[0];
-type CookieToSet = CookiesToSet[number];
 
 export async function createServerSupabaseClient() {
   const cookieStore = cookies();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+  if (!supabaseUrl || !serviceRoleKey) {
+    return null;
+  }
 
   return createServerClient(
     supabaseUrl,
-    supabaseAnonKey,
+    serviceRoleKey,
     {
       cookies: {
         getAll() {
           return cookieStore.getAll();
         },
-        setAll(cookiesToSet: CookiesToSet) {
+        setAll(cookiesToSet: { name: string; value: string; options?: CookieOptions }[]) {
           try {
-            cookiesToSet.forEach(({ name, value, options }: CookieToSet) =>
-              cookieStore.set(name, value, options)
-            );
+            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
           } catch {
-            // Handled in server components
+            // Server-only cookie writes are handled safely here.
           }
         },
       },

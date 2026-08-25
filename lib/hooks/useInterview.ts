@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  InterviewState, 
-  QuestionObject, 
-  AnswerRecord, 
-  AgentDecisionContract, 
-  ValidationSummary, 
-  DiscoveryReport 
+import {
+  InterviewState,
+  QuestionObject,
+  AnswerRecord,
+  AgentDecisionContract,
+  ValidationSummary,
+  DiscoveryReport
 } from '@/lib/ai/types';
 
 const LOCAL_STORAGE_KEY = 'agy_agent_runtime_state';
@@ -24,7 +24,13 @@ export function useInterview(interviewIdFromParam?: string) {
   /**
    * Initializes a new discovery interview session
    */
-  const startNewInterview = useCallback(async () => {
+  const startNewInterview = useCallback(async (companyInfo?: {
+    companyName: string;
+    respondentName?: string;
+    respondentRole?: string;
+    respondentEmail?: string;
+    respondentPhone?: string;
+  }) => {
     setIsLoading(true);
     setError(null);
 
@@ -32,9 +38,13 @@ export function useInterview(interviewIdFromParam?: string) {
       const res = await fetch('/api/interview/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(companyInfo || {}),
       });
 
-      if (!res.ok) throw new Error('Failed to initialize discovery interview session.');
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload.error || 'Failed to initialize discovery interview session.');
+      }
 
       const data = await res.json();
       const newState: InterviewState = data.state;
@@ -51,6 +61,14 @@ export function useInterview(interviewIdFromParam?: string) {
         currentQuestion: decision.question,
         recentAnswers: []
       }));
+
+      if (data.interviewId) {
+        localStorage.setItem('discovery_interview_id', data.interviewId);
+      }
+
+      if (data.companyId) {
+        localStorage.setItem('discovery_company_id', data.companyId);
+      }
 
       return newState.interviewId;
     } catch (err: any) {
