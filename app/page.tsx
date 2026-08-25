@@ -12,7 +12,7 @@ export default function LandingPage() {
           </div>
           <div>
             <h1 className="text-base font-bold tracking-tight">AI Business Discovery</h1>
-            <p className="text-xs text-subtle font-mono">Antigravity Operations Agent</p>
+            <p className="text-xs text-subtle font-mono">Probetech Operations Agent</p>
           </div>
         </div>
 
@@ -87,7 +87,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="w-full max-w-5xl mx-auto px-6 py-8 text-center text-xs text-subtle font-mono border-t border-borderDark">
-        AI Business Discovery Agent &bull; Powered by Antigravity AI Engine
+        AI Business Discovery Agent &bull; Powered by Probetech AI Engine
       </footer>
     </div>
   );

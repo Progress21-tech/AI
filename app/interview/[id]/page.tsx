@@ -19,8 +19,14 @@ export default function InterviewPage() {
     report,
     submitAnswer,
     generateReport,
-    restartInterview,
+    startNewInterview,
   } = useInterview();
+
+  React.useEffect(() => {
+    if (!state) {
+      void startNewInterview();
+    }
+  }, [state, startNewInterview]);
 
   // 1. Render Completed Business Discovery Report
   if (report) {
@@ -29,7 +35,7 @@ export default function InterviewPage() {
         <div className="w-full max-w-5xl mx-auto px-4 flex justify-between items-center mb-4">
           <span className="text-xs font-mono text-subtle">Phase: Report Completed</span>
           <button
-            onClick={restartInterview}
+            onClick={() => void startNewInterview()}
             className="text-xs font-mono text-black underline hover:opacity-75"
           >
             Start New Discovery Session
@@ -45,9 +51,11 @@ export default function InterviewPage() {
     return (
       <div className="min-h-screen bg-white text-black flex flex-col">
         <Header
-          questionCount={state.questionCount}
-          estimatedMinutesLeft={state.estimatedRemainingMinutes}
+          questionCount={state?.questionsAsked ?? 0}
+          startedAt={state?.startedAt}
+          targetSeconds={state?.targetDurationSeconds}
           phase="validation"
+          timeMode={state?.timeMode}
         />
         <ValidationScreen
           summary={validationSummary}
@@ -59,13 +67,23 @@ export default function InterviewPage() {
   }
 
   // 3. Render One-Question Interview Card Flow (PRD Section 6.2 & 6.3)
+  if (!state || !currentQuestion) {
+    return (
+      <div className="min-h-screen bg-white text-black flex items-center justify-center">
+        <ThinkingIndicator />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white text-black flex flex-col justify-between selection:bg-black selection:text-white">
       {/* Header with progress & time budget */}
       <Header
-        questionCount={state.questionCount}
-        estimatedMinutesLeft={state.estimatedRemainingMinutes}
-        phase={state.interviewPhase}
+        questionCount={state.questionsAsked}
+        startedAt={state.startedAt}
+        targetSeconds={state.targetDurationSeconds}
+        phase={state.phase}
+        timeMode={state.timeMode}
       />
 
       {/* Center Stage: Question Card & Transitions */}
