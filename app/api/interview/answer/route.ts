@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AIProvider } from '@/lib/ai/provider';
+import { runAgent } from '@/lib/agent/runtime';
 import { InterviewState, AnswerRecord } from '@/lib/ai/types';
-
-const aiProvider = new AIProvider();
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,23 +18,36 @@ export async function POST(req: NextRequest) {
     const updatedState: InterviewState = {
       ...state,
       lastActivityAt: new Date().toISOString(),
+      questionsAsked: state.questionsAsked + 1
     };
 
-    // Calculate server-authoritative timer metrics
-    const timeMetrics = aiProvider.calculateTimeMetrics(updatedState);
-    updatedState.elapsedSeconds = timeMetrics.elapsedSeconds;
-    updatedState.estimatedRemainingSeconds = timeMetrics.estimatedRemainingSeconds;
-
-    const decision = await aiProvider.processAnswerAndGetNextStep(
-      updatedState,
-      answer,
-      recentAnswers || []
-    );
+    // Execute provider-agnostic agent runtime
+    const { response, updatedState: finalState } = await runAgent(updatedState);
 
     return NextResponse.json({
       success: true,
-      decision,
-      updatedTimeMetrics: timeMetrics,
+      decision: {
+        action: response.action,
+        phase: response.phase,
+        objective: response.objective,
+        timeMode: response.timer.mode,
+        question: response.question ? {
+          id: `q-${finalState.questionsAsked}`,
+          text: response.question.text,
+          type: response.question.type,
+          options: response.question.options,
+          required: true,
+          objective: response.objective,
+          category: response.phase,
+          phase: response.phase,
+          sequence: finalState.questionsAsked
+        } : null,
+        confidence: response.confidence
+      },
+      updatedTimeMetrics: {
+        elapsedSeconds: finalState.elapsedSeconds,
+        estimatedRemainingSeconds: finalState.estimatedRemainingSeconds,
+      },
     });
   } catch (error: any) {
     console.error('Error in /api/interview/answer:', error);

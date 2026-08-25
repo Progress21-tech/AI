@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AIProvider } from '@/lib/ai/provider';
+import { runAgent } from '@/lib/agent/runtime';
 import { InterviewState } from '@/lib/ai/types';
-
-const aiProvider = new AIProvider();
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,20 +18,37 @@ export async function POST(req: NextRequest) {
       questionsAsked: 1,
       startedAt: nowISO,
       lastActivityAt: nowISO,
-      targetDurationSeconds: 720, // 12 minutes target budget
+      targetDurationSeconds: 720,
       elapsedSeconds: 0,
       estimatedRemainingSeconds: 720,
       timeMode: 'normal',
     };
 
-    // Dynamically generate the VERY FIRST question from AI
-    const decision = await aiProvider.generateFirstQuestion(initialState);
+    // Execute provider-agnostic agent runtime
+    const { response, updatedState } = await runAgent(initialState);
 
     return NextResponse.json({
       success: true,
       interviewId,
-      state: initialState,
-      decision,
+      state: updatedState,
+      decision: {
+        action: response.action,
+        phase: response.phase,
+        objective: response.objective,
+        timeMode: response.timer.mode,
+        question: response.question ? {
+          id: 'q-1',
+          text: response.question.text,
+          type: response.question.type,
+          options: response.question.options,
+          required: true,
+          objective: response.objective,
+          category: response.phase,
+          phase: response.phase,
+          sequence: 1
+        } : null,
+        confidence: response.confidence
+      },
     });
   } catch (error: any) {
     console.error('Error in /api/interview/start:', error);
