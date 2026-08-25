@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AIProvider } from '@/lib/ai/provider';
+import { generateDiscoveryReport, generateValidationSummary } from '@/lib/ai/reporting';
 import { InterviewState } from '@/lib/ai/types';
-
-const aiProvider = new AIProvider();
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,12 +17,12 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === 'get_validation') {
-      const summary = aiProvider.generateValidationSummary(state);
+      const summary = generateValidationSummary(state);
       return NextResponse.json({ success: true, summary });
     }
 
     if (action === 'generate_report') {
-      const report = aiProvider.generateReport(state, validationChoice);
+      const report = generateDiscoveryReport(state, validationChoice, correctionText);
       return NextResponse.json({ success: true, report });
     }
 

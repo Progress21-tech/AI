@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AIProvider } from '@/lib/ai/provider';
+import { runAgent } from '@/lib/agent/runtime';
 import { InterviewState, AnswerRecord } from '@/lib/ai/types';
-
-const aiProvider = new AIProvider();
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,24 +19,25 @@ export async function POST(req: NextRequest) {
     }
 
     const startTime = Date.now();
-    const reasoningResult = await aiProvider.processAnswerAndGetNextStep(
-      state,
-      answer,
-      recentAnswers || []
-    );
+    const stateForRun: InterviewState = {
+      ...state,
+      lastActivityAt: new Date().toISOString(),
+      questionsAsked: state.questionsAsked + (answer ? 1 : 0),
+    };
+    const { response } = await runAgent(stateForRun);
     const latencyMs = Date.now() - startTime;
 
     const logEntry = {
       timestamp: new Date().toISOString(),
-      phase: reasoningResult.phase,
-      objective: reasoningResult.objective,
+      phase: response.phase,
+      objective: response.objective,
       latencyMs,
     };
     console.log('[OBSERVABILITY_LOG]', JSON.stringify(logEntry));
 
     return NextResponse.json({
       success: true,
-      result: reasoningResult,
+      result: response,
       latencyMs,
     });
   } catch (error: any) {

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AIProvider } from '@/lib/ai/provider';
+import { calculateServerTimer } from '@/lib/agent/timer';
 import { InterviewState } from '@/lib/ai/types';
-
-const aiProvider = new AIProvider();
 
 export async function GET(req: NextRequest) {
   try {
@@ -31,7 +29,7 @@ export async function GET(req: NextRequest) {
       timeMode: 'normal',
     };
 
-    const timeMetrics = aiProvider.calculateTimeMetrics(mockState);
+    const timeMetrics = calculateServerTimer(mockState);
 
     return NextResponse.json({
       success: true,

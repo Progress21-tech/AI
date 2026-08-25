@@ -5,16 +5,14 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useInterview } from '@/lib/hooks/useInterview';
 import { DiscoveryReportView } from '@/components/report/DiscoveryReport';
-import { AIProvider } from '@/lib/ai/provider';
-
-const fallbackAiProvider = new AIProvider();
+import { generateDiscoveryReport } from '@/lib/ai/reporting';
 
 export default function DiscoveryReportPage() {
   const params = useParams();
   const interviewId = params?.id as string;
   const { report, state } = useInterview(interviewId);
 
-  const displayReport = report || (state ? fallbackAiProvider.generateReport(state) : fallbackAiProvider.generateReport({
+  const displayReport = report || (state ? generateDiscoveryReport(state) : generateDiscoveryReport({
     interviewId: interviewId || 'int-demo',
     phase: 'complete',
     businessFacts: [],
