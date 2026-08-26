@@ -35,7 +35,9 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const protectedPaths = ['/dashboard', '/admin'];
+  // Respondents never authenticate. Only the internal administration area is
+  // protected here; admin pages additionally enforce role checks server-side.
+  const protectedPaths = ['/admin'];
 
   const isProtected = protectedPaths.some(
     (path) =>
@@ -56,6 +58,4 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
-export const config = {
-  matcher: ['/dashboard/:path*', '/admin/:path*'],
-};
+export const config = { matcher: ['/admin/:path*'] };
