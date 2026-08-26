@@ -8,7 +8,6 @@ export type FixedQuestion = {
 // The public interview is intentionally small and deterministic. These snapshots
 // are also written to `interview_questions` so historic responses remain readable.
 export const fixedQuestions: FixedQuestion[] = [
-  { key: 'company_name', text: 'What is the name of your company?', type: 'short_text' },
   { key: 'industry', text: 'What industry does your company operate in?', type: 'short_text' },
   { key: 'company_size', text: 'How many people work at your company?', type: 'single_choice', options: ['1–5', '6–10', '11–50', '51–200', '201+'] },
   { key: 'website', text: 'What is your company website? (optional)', type: 'short_text' },

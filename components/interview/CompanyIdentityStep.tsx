@@ -59,8 +59,8 @@ export function CompanyIdentityStep({ onSubmit, isLoading = false }: CompanyIden
                     <Building2 className="h-5 w-5" />
                 </div>
                 <div>
-                    <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-subtle">Company Identity</p>
-                    <h2 className="text-2xl font-bold tracking-tight text-black">Let&apos;s start with the business.</h2>
+                    <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-subtle">Get started</p>
+                    <h2 className="text-2xl font-bold tracking-tight text-black">Tell us who you are.</h2>
                 </div>
             </div>
 
@@ -103,7 +103,7 @@ export function CompanyIdentityStep({ onSubmit, isLoading = false }: CompanyIden
 
                 <div className="space-y-2">
                     <label htmlFor="respondentRole" className="text-xs font-mono uppercase tracking-[0.12em] text-subtle">
-                        Role
+                        Role (optional)
                     </label>
                     <input
                         id="respondentRole"

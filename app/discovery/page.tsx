@@ -24,6 +24,11 @@ export default function DiscoveryStartPage() {
   return (
     <div className="min-h-screen bg-white text-black flex flex-col justify-center p-6">
       <div className="mx-auto w-full max-w-3xl">
+        <div className="mb-8 max-w-xl">
+          <p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">Business discovery</p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">A few quick questions about your business.</h1>
+          <p className="mt-3 text-sm leading-6 text-subtle">This short interview takes about 10 minutes. No account or sign-in is required.</p>
+        </div>
         <CompanyIdentityStep onSubmit={handleSubmit} isLoading={isLoading} />
       </div>
     </div>
