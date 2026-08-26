@@ -1,52 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { calculateServerTimer } from '@/lib/agent/timer';
-import { InterviewState } from '@/lib/ai/types';
-import { getAuthContext } from '@/lib/auth/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createServiceRoleSupabaseClient } from '@/lib/supabase/server';
+import { fixedQuestionByKey, fixedQuestions } from '@/lib/interview/fixedQuestions';
 
 export async function GET(req: NextRequest) {
   try {
-    const auth = await getAuthContext();
-    if (!auth) return NextResponse.json({ error: 'Authentication is required.' }, { status: 401 });
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
-
-    if (!id) {
-      return NextResponse.json({ error: 'Missing interview ID' }, { status: 400 });
-    }
-
-    const supabase = await createServerSupabaseClient();
-    const { data: persisted } = supabase ? await supabase.from('interviews').select('id,status,current_question_id,started_at,last_activity_at,target_duration_seconds').eq('id', id).maybeSingle() : { data: null };
-    if (!persisted) return NextResponse.json({ error: 'Interview not found or not authorized.' }, { status: 404 });
-    // RLS has verified the row; timestamps remain the timer source of truth.
-    const mockState: InterviewState = {
-      interviewId: persisted.id,
-      phase: 'orientation',
-      businessFacts: [],
-      workflows: [],
-      problems: [],
-      unknowns: [],
-      currentObjective: 'establish_business_context',
-      questionsAsked: 0,
-      startedAt: persisted.started_at,
-      lastActivityAt: persisted.last_activity_at,
-      targetDurationSeconds: persisted.target_duration_seconds,
-      elapsedSeconds: 0,
-      estimatedRemainingSeconds: persisted.target_duration_seconds,
-      timeMode: 'normal',
-    };
-
-    const timeMetrics = calculateServerTimer(mockState);
-
-    return NextResponse.json({
-      success: true,
-      state: {
-        ...mockState,
-        elapsedSeconds: timeMetrics.elapsedSeconds,
-        estimatedRemainingSeconds: timeMetrics.estimatedRemainingSeconds,
-      },
-    });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const id = new URL(req.url).searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'Missing interview ID.' }, { status: 400 });
+    const supabase = await createServiceRoleSupabaseClient();
+    if (!supabase) return NextResponse.json({ error: 'The interview service is not configured.' }, { status: 503 });
+    const { data: interview } = await supabase.from('interviews').select('status,current_question_id').eq('id', id).maybeSingle();
+    if (!interview) return NextResponse.json({ error: 'Interview not found.' }, { status: 404 });
+    const question = interview.current_question_id ? fixedQuestionByKey.get(interview.current_question_id) ?? null : null;
+    const questionNumber = question ? fixedQuestions.findIndex((item) => item.key === question.key) + 1 : fixedQuestions.length;
+    return NextResponse.json({ question, questionNumber, totalQuestions: fixedQuestions.length, completed: interview.status === 'completed' || !question });
+  } catch (error) {
+    console.error('[interview/state]', error);
+    return NextResponse.json({ error: 'We could not restore this interview.' }, { status: 500 });
   }
 }

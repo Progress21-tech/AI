@@ -1,242 +1,55 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import {
-  InterviewState,
-  QuestionObject,
-  AnswerRecord,
-  AgentDecisionContract,
-  ValidationSummary,
-  DiscoveryReport
-} from '@/lib/ai/types';
+import { useCallback, useEffect, useState } from 'react';
+import type { FixedQuestion } from '@/lib/interview/fixedQuestions';
 
-const LOCAL_STORAGE_KEY = 'agy_agent_runtime_state';
+type Runtime = { question: FixedQuestion | null; questionNumber: number; totalQuestions: number; completed: boolean };
 
-export function useInterview(interviewIdFromParam?: string) {
-  const [state, setState] = useState<InterviewState | null>(null);
-  const [currentQuestion, setCurrentQuestion] = useState<QuestionObject | null>(null);
-  const [recentAnswers, setRecentAnswers] = useState<AnswerRecord[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+export function useInterview(interviewId?: string) {
+  const [runtime, setRuntime] = useState<Runtime>({ question: null, questionNumber: 1, totalQuestions: 12, completed: false });
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [validationSummary, setValidationSummary] = useState<ValidationSummary | null>(null);
-  const [report, setReport] = useState<DiscoveryReport | null>(null);
 
-  /**
-   * Initializes a new discovery interview session
-   */
-  const startNewInterview = useCallback(async (companyInfo?: {
-    companyName: string;
-    respondentName?: string;
-    respondentRole?: string;
-    respondentEmail?: string;
-    respondentPhone?: string;
-  }) => {
+  const loadInterview = useCallback(async () => {
+    if (!interviewId) return;
     setIsLoading(true);
-    setError(null);
-
     try {
-      const res = await fetch('/api/interview/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(companyInfo || {}),
-      });
+      const response = await fetch(`/api/interview/state?id=${encodeURIComponent(interviewId)}`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      setRuntime(data);
+    } catch {
+      setError('We could not restore this interview. Please start a new one.');
+    } finally { setIsLoading(false); }
+  }, [interviewId]);
 
-      if (!res.ok) {
-        const payload = await res.json().catch(() => ({}));
-        throw new Error(payload.error || 'Failed to initialize discovery interview session.');
-      }
+  useEffect(() => { loadInterview(); }, [loadInterview]);
 
-      const data = await res.json();
-      const newState: InterviewState = data.state;
-      const decision: AgentDecisionContract = data.decision;
-
-      setState(newState);
-      setCurrentQuestion(decision.question);
-      setRecentAnswers([]);
-      setValidationSummary(null);
-      setReport(null);
-
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({
-        state: newState,
-        currentQuestion: decision.question,
-        recentAnswers: []
-      }));
-
-      if (data.interviewId) {
-        localStorage.setItem('discovery_interview_id', data.interviewId);
-      }
-
-      if (data.companyId) {
-        localStorage.setItem('discovery_company_id', data.companyId);
-      }
-
-      return newState.interviewId;
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Session start failed');
+  const startNewInterview = useCallback(async (companyInfo: { companyName: string; respondentName?: string; respondentRole?: string; respondentEmail?: string; respondentPhone?: string }) => {
+    setIsLoading(true); setError(null);
+    try {
+      const response = await fetch('/api/interview/start', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(companyInfo) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      return data.interviewId as string;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'We could not start your interview.');
       return null;
-    } finally {
-      setIsLoading(false);
-    }
+    } finally { setIsLoading(false); }
   }, []);
 
-  // Sync state on load
-  useEffect(() => {
+  const submitAnswer = useCallback(async (answerText?: string, selectedOptions?: string[]) => {
+    if (!interviewId || !runtime.question) return;
+    setIsLoading(true); setError(null);
     try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.state) setState(parsed.state);
-        if (parsed.currentQuestion) setCurrentQuestion(parsed.currentQuestion);
-        if (parsed.recentAnswers) setRecentAnswers(parsed.recentAnswers);
-        if (parsed.validationSummary) setValidationSummary(parsed.validationSummary);
-        if (parsed.report) setReport(parsed.report);
-      }
-    } catch (e) {
-      console.warn('Could not restore local state:', e);
-    }
-  }, []);
+      const response = await fetch('/api/interview/answer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ interviewId, questionKey: runtime.question.key, answerText, selectedOptions }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      setRuntime({ question: data.question, questionNumber: data.questionNumber, totalQuestions: data.totalQuestions, completed: data.completed });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "We couldn't save your answer. Please try again.");
+    } finally { setIsLoading(false); }
+  }, [interviewId, runtime.question]);
 
-  // Save state updates to localStorage
-  useEffect(() => {
-    if (state && currentQuestion) {
-      try {
-        localStorage.setItem(
-          LOCAL_STORAGE_KEY,
-          JSON.stringify({
-            state,
-            currentQuestion,
-            recentAnswers,
-            validationSummary,
-            report,
-          })
-        );
-      } catch (e) {
-        console.warn('Failed to save state:', e);
-      }
-    }
-  }, [state, currentQuestion, recentAnswers, validationSummary, report]);
-
-  /**
-   * Submits user answer, persists before requesting next step
-   */
-  const submitAnswer = async (answerText?: string, selectedOptions?: string[]) => {
-    if (!state || !currentQuestion) return;
-
-    setIsLoading(true);
-    setError(null);
-
-    const answerRecord: AnswerRecord = {
-      id: `ans-${Date.now()}`,
-      questionId: currentQuestion.id,
-      questionText: currentQuestion.text,
-      answerText,
-      selectedOptions,
-      timestamp: new Date().toISOString(),
-    };
-
-    const updatedAnswers = [...recentAnswers, answerRecord];
-    setRecentAnswers(updatedAnswers);
-
-    try {
-      const res = await fetch('/api/interview/answer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          state,
-          answer: answerRecord,
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error("I'm having trouble generating the next question. Please try again.");
-      }
-
-      const data = await res.json();
-      const decision: AgentDecisionContract = data.decision;
-
-      const newState: InterviewState = data.state ?? {
-        ...state,
-        phase: decision.phase,
-        timeMode: decision.timeMode,
-        questionsAsked: state.questionsAsked + 1,
-        elapsedSeconds: data.updatedTimeMetrics?.elapsedSeconds || state.elapsedSeconds,
-        estimatedRemainingSeconds: data.updatedTimeMetrics?.estimatedRemainingSeconds || state.estimatedRemainingSeconds,
-      };
-
-      setState(newState);
-
-      if (decision.action === 'validate_summary' || decision.action === 'finish_interview') {
-        fetchValidationSummary(newState);
-      } else {
-        setCurrentQuestion(decision.question);
-      }
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || "I'm having trouble generating the next question. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchValidationSummary = async (targetState: InterviewState) => {
-    try {
-      const res = await fetch('/api/interview/complete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'get_validation',
-          state: targetState,
-        }),
-      });
-      const data = await res.json();
-      if (data.summary) {
-        setValidationSummary(data.summary);
-      }
-    } catch (e) {
-      console.error('Validation fetch error:', e);
-    }
-  };
-
-  const generateReport = async (validationChoice: string, correctionText?: string) => {
-    if (!state) return;
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const res = await fetch('/api/interview/complete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'generate_report',
-          state,
-          validationChoice,
-          correctionText,
-        }),
-      });
-
-      const data = await res.json();
-      if (data.report) {
-        setReport(data.report);
-        setState((prev) => prev ? ({ ...prev, phase: 'complete' }) : null);
-      }
-    } catch (err: any) {
-      setError('Report generation failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return {
-    state,
-    currentQuestion,
-    recentAnswers,
-    isLoading,
-    error,
-    validationSummary,
-    report,
-    startNewInterview,
-    submitAnswer,
-    generateReport,
-  };
+  return { ...runtime, isLoading, error, startNewInterview, submitAnswer, retry: loadInterview };
 }

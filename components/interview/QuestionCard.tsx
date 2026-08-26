@@ -1,56 +1,8 @@
 'use client';
 
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { QuestionObject } from '@/lib/ai/types';
 import { AnswerInputs } from './AnswerInputs';
+import type { FixedQuestion } from '@/lib/interview/fixedQuestions';
 
-interface QuestionCardProps {
-  question: QuestionObject;
-  onSubmitAnswer: (answerText?: string, selectedOptions?: string[]) => void;
-  isLoading?: boolean;
+export function QuestionCard({ question, onSubmitAnswer, isLoading }: { question: FixedQuestion; onSubmitAnswer: (answerText?: string, selectedOptions?: string[]) => void; isLoading: boolean }) {
+  return <div className="mx-auto w-full max-w-2xl px-5 py-8 sm:px-6"><section className="rounded-3xl border border-black/10 bg-white p-6 shadow-sm sm:p-10"><p className="text-xs font-semibold uppercase tracking-[.14em] text-subtle">Your response</p><h1 className="mt-4 text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">{question.text}</h1><AnswerInputs type={question.type} options={question.options} onSubmit={onSubmitAnswer} disabled={isLoading} /></section></div>;
 }
-
-export const QuestionCard: React.FC<QuestionCardProps> = ({
-  question,
-  onSubmitAnswer,
-  isLoading = false,
-}) => {
-  return (
-    <div className="w-full max-w-2xl mx-auto px-4 py-8">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={question.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="glass-card p-6 sm:p-10 rounded-2xl border border-borderDark flex flex-col gap-6"
-        >
-          {/* Badge & Meta */}
-          <div className="flex items-center justify-between text-xs font-mono text-subtle">
-            <span className="uppercase tracking-wider px-2.5 py-1 rounded-md bg-surface border border-borderDark text-black">
-              {question.category.replace(/_/g, ' ')}
-            </span>
-            <span className="capitalize">
-              {question.type.replace(/_/g, ' ')}
-            </span>
-          </div>
-
-          {/* Main Question Text (PRD Section 6.2 & 10) */}
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-black leading-snug">
-            {question.text}
-          </h2>
-
-          {/* Input Form Controls */}
-          <AnswerInputs
-            type={question.type}
-            options={question.options}
-            onSubmit={onSubmitAnswer}
-            disabled={isLoading}
-          />
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-};
