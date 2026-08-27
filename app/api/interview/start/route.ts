@@ -11,7 +11,10 @@ export async function POST(req: NextRequest) {
     const interviewId = crypto.randomUUID();
     const now = new Date().toISOString();
     const supabase = await createServiceRoleSupabaseClient();
-    if (!supabase) return NextResponse.json({ error: 'The interview service is not configured. Please try again later.' }, { status: 503 });
+    if (!supabase) {
+      console.error('[interview/start] SUPABASE_SERVICE_ROLE_KEY is not configured');
+      return NextResponse.json({ error: 'The interview service is temporarily unavailable. Please try again later.', code: 'PERSISTENCE_NOT_CONFIGURED' }, { status: 503 });
+    }
     const { data: existing } = await supabase.from('companies').select('id').ilike('name', payload.companyName).limit(1).maybeSingle();
     let companyId = existing?.id;
     if (!companyId) {
