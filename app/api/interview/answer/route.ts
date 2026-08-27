@@ -30,7 +30,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'We could not match this question to your interview. Please refresh and try again.' }, { status: 409 });
     }
     const { data: prior } = await supabase.from('answers').select('id').eq('interview_id', payload.interviewId).eq('question_id', snapshot.id).maybeSingle();
-    const answer = { answer_text: answerText || null, answer_json: { selectedOptions: payload.selectedOptions ?? [] } };
+    // Production stores the selected option(s) as plain text. Keep this write
+    // limited to columns that exist in the live `answers` table.
+    const answer = { answer_text: answerText };
     const answerResult = prior ? await supabase.from('answers').update(answer).eq('id', prior.id) : await supabase.from('answers').insert({ interview_id: payload.interviewId, question_id: snapshot.id, ...answer });
     if (answerResult.error) {
       console.error('[interview/answer] answer write failed', { code: answerResult.error.code, message: answerResult.error.message, details: answerResult.error.details, interviewId: payload.interviewId, questionId: snapshot.id });
