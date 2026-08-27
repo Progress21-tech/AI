@@ -13,8 +13,8 @@ const geistMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'AI Business Discovery Agent',
-  description: 'Adaptive AI interviewer that understands business operations, discovers high-value problems, and produces structured business discovery reports.',
+  title: 'Business Discovery',
+  description: 'A short, account-free business discovery interview.',
 };
 
 export default function RootLayout({
