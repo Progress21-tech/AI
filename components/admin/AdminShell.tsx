@@ -22,8 +22,6 @@ export function AdminShell({ children, title, description }: { children: React.R
                             ['/admin', 'Overview'],
                             ['/admin/companies', 'Companies'],
                             ['/admin/interviews', 'Interviews'],
-                            ['/admin/reports', 'Reports'],
-                            ['/dashboard', 'Back to Dashboard'],
                         ].map(([href, label]) => <Link key={href} href={href} className="rounded-lg border border-black/10 bg-white px-3 py-2 transition hover:border-black hover:bg-black hover:text-white">{label}</Link>)}
                     </nav>
                 </header>
