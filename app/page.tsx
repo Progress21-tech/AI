@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { SiteHeader } from '@/components/site/SiteHeader';
+import { estimateReadMinutes } from '@/lib/content/markdown';
+import { getPublishedCaseStudies, getPublishedPosts } from '@/lib/content/data';
 
 export const metadata: Metadata = {
   title: 'ProbeTech | AI Automation, Chatbots & Custom Software',
@@ -26,7 +28,10 @@ const principles = [
   'You talk to the person building your system.',
 ];
 
-export default function HomePage() {
+export const revalidate = 300;
+
+export default async function HomePage() {
+  const [posts, work] = await Promise.all([getPublishedPosts(), getPublishedCaseStudies()]);
   return (
     <>
       <SiteHeader />
@@ -90,6 +95,18 @@ export default function HomePage() {
             {principles.map((principle) => <li key={principle} className="py-4 text-base leading-7">{principle}</li>)}
           </ul>
         </section>
+
+        {posts.length > 0 && <section className="border-y border-black/10 bg-surface">
+          <div className="mx-auto max-w-6xl px-6 py-14 sm:py-16">
+            <div className="mb-7 flex items-end justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">Insights</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">What businesses are telling us</h2></div><Link href="/insights" className="text-sm font-medium underline underline-offset-4">All insights</Link></div>
+            <div className="grid gap-4 md:grid-cols-3">{posts.slice(0, 3).map((post) => <Link key={post.id} href={`/insights/${post.slug}`} className="rounded-2xl border border-black/10 bg-white p-5 transition hover:border-black/30"><p className="text-xs text-subtle">{post.category} · {estimateReadMinutes(post.body)} min read</p><h3 className="mt-3 text-lg font-semibold tracking-tight">{post.title}</h3><p className="mt-2 line-clamp-3 text-sm leading-6 text-subtle">{post.excerpt}</p></Link>)}</div>
+          </div>
+        </section>}
+
+        {work.length > 0 && <section className="mx-auto max-w-6xl px-6 py-14 sm:py-16">
+          <div className="mb-7 flex items-end justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">Work</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">Featured work</h2></div><Link href="/work" className="text-sm font-medium underline underline-offset-4">All work</Link></div>
+          <div className="grid gap-4 md:grid-cols-2">{work.slice(0, 2).map((study) => <Link key={study.id} href={`/work/${study.slug}`} className="rounded-2xl border border-black/10 p-6 transition hover:border-black/30"><p className="text-xs uppercase tracking-wide text-subtle">{study.service_type.replace(/_/g, ' ')}</p><h3 className="mt-2 text-xl font-semibold tracking-tight">{study.project_title}</h3><p className="mt-3 text-sm leading-6 text-subtle">{study.summary}</p></Link>)}</div>
+        </section>}
 
         <section className="border-t border-black/10 bg-surface">
           <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-6 py-16 sm:flex-row sm:items-center sm:py-20">
