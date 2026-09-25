@@ -42,27 +42,27 @@ export function SiteNavigation({ hasCaseStudies, hasBlogs }: Props) {
   }, [open]);
 
   const close = () => { setOpen(false); window.requestAnimationFrame(() => toggleRef.current?.focus()); };
-  const linkStyle = 'text-subtle transition-colors duration-200 ease-out hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black';
-  const ctaStyle = 'inline-flex min-h-11 items-center justify-center rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white transition-colors duration-200 ease-out hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black';
+  const linkStyle = 'text-subtle transition-colors duration-200 ease-out hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black motion-reduce:transition-none';
+  const ctaStyle = 'inline-flex min-h-11 items-center justify-center rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white transition-colors duration-200 ease-out hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black motion-reduce:transition-none';
 
   return <>
     <nav aria-label="Main navigation" className="hidden items-center gap-5 text-sm lg:flex">
       {links.map((link) => <Link key={link.href} className={linkStyle} href={link.href}>{link.label}</Link>)}
       <Link href="/book-a-call" className={ctaStyle}>Book a Discovery Call</Link>
     </nav>
-    <button ref={toggleRef} type="button" className="relative z-[70] inline-flex h-11 w-11 items-center justify-center rounded-lg border border-black/10 bg-white text-black transition-colors duration-200 hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black lg:hidden" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen((value) => !value)}>
+    <button ref={toggleRef} type="button" className="relative z-[70] inline-flex h-11 w-11 items-center justify-center rounded-lg border border-black/10 bg-white text-black transition-colors duration-200 hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black motion-reduce:transition-none lg:hidden" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen((value) => !value)}>
       <span className="sr-only">{open ? 'Close navigation menu' : 'Open navigation menu'}</span>
       <span aria-hidden="true" className="relative block h-4 w-5">
-        <span className={`absolute left-0 top-0 h-0.5 w-5 bg-current transition-transform duration-200 ease-out ${open ? 'translate-y-[7px] rotate-45' : ''}`} />
-        <span className={`absolute left-0 top-[7px] h-0.5 w-5 bg-current transition-opacity duration-200 ease-out ${open ? 'opacity-0' : ''}`} />
-        <span className={`absolute left-0 top-[14px] h-0.5 w-5 bg-current transition-transform duration-200 ease-out ${open ? '-translate-y-[7px] -rotate-45' : ''}`} />
+        <span className={`absolute left-0 top-0 h-0.5 w-5 bg-current transition-transform duration-200 ease-out motion-reduce:transition-none ${open ? 'translate-y-[7px] rotate-45' : ''}`} />
+        <span className={`absolute left-0 top-[7px] h-0.5 w-5 bg-current transition-opacity duration-200 ease-out motion-reduce:transition-none ${open ? 'opacity-0' : ''}`} />
+        <span className={`absolute left-0 top-[14px] h-0.5 w-5 bg-current transition-transform duration-200 ease-out motion-reduce:transition-none ${open ? '-translate-y-[7px] -rotate-45' : ''}`} />
       </span>
     </button>
     <AnimatePresence>
       {open && <motion.div className="fixed inset-0 z-[60] bg-black/20 lg:hidden" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : 0.18, ease: 'easeOut' }} onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}>
         <motion.div ref={panelRef} id="mobile-navigation" role="dialog" aria-modal="true" aria-label="Site navigation" className="absolute inset-y-0 right-0 flex w-[min(88vw,24rem)] flex-col bg-white px-6 pb-8 pt-24 shadow-2xl" initial={reduceMotion ? false : { x: '100%' }} animate={{ x: 0 }} exit={{ x: reduceMotion ? 0 : '100%' }} transition={{ duration: reduceMotion ? 0 : 0.2, ease: 'easeOut' }}>
           <nav aria-label="Mobile navigation" className="flex flex-col items-stretch gap-1">
-            {links.map((link) => <Link key={link.href} href={link.href} onClick={close} className="rounded-lg px-3 py-3.5 text-base text-black transition-colors duration-200 hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-black">{link.label}</Link>)}
+            {links.map((link) => <Link key={link.href} href={link.href} onClick={close} className="rounded-lg px-3 py-3.5 text-base text-black transition-colors duration-200 hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-black motion-reduce:transition-none">{link.label}</Link>)}
             <Link href="/book-a-call" onClick={close} className={`${ctaStyle} mt-4 w-full`}>Book a Discovery Call</Link>
           </nav>
         </motion.div>

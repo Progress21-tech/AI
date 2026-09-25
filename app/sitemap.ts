@@ -12,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: absoluteSiteUrl('/services/ai-chatbots'), changeFrequency: 'monthly', priority: 0.8 },
     { url: absoluteSiteUrl('/services/custom-software'), changeFrequency: 'monthly', priority: 0.8 },
     { url: absoluteSiteUrl('/how-we-work'), changeFrequency: 'monthly', priority: 0.8 },
+    { url: absoluteSiteUrl('/about'), changeFrequency: 'monthly', priority: 0.6 },
     { url: absoluteSiteUrl('/book-a-call'), changeFrequency: 'monthly', priority: 0.9 },
   ];
   if (posts.length) pages.push({ url: absoluteSiteUrl('/blogs'), changeFrequency: 'weekly', priority: 0.7 });
