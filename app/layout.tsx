@@ -13,8 +13,15 @@ const geistMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Business Discovery',
-  description: 'A short, account-free business discovery interview.',
+  metadataBase: new URL('https://aibusinessdiscoveryfor.vercel.app'),
+  title: 'ProbeTech | AI Automation, Chatbots & Custom Software',
+  description: 'ProbeTech designs AI automations, chatbots, and custom software for growing businesses.',
+  openGraph: {
+    siteName: 'ProbeTech',
+    locale: 'en_NG',
+    type: 'website',
+  },
+  icons: { icon: '/probetech-mark.svg' },
 };
 
 export default function RootLayout({
