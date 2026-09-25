@@ -81,8 +81,41 @@ main.public-site p.text-base { font-size: 0.875rem; }
 main.public-site p.text-lg { font-size: 1rem; }
 main.public-site p.text-xs { font-size: 0.6875rem; }
 
+[data-reveal='pending'] {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+[data-reveal='pending'],
+[data-reveal='visible'] {
+  transition: opacity 180ms ease-out, transform 180ms ease-out;
+}
+
+[data-reveal='visible'] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+main.public-site a,
+main.public-site button,
+.site-header a,
+.site-header button,
+.site-footer a {
+  transition-property: color, background-color, border-color, opacity, transform;
+  transition-duration: 180ms;
+  transition-timing-function: ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  main.public-site *,
-  header *,
-  footer * { scroll-behavior: auto !important; }
+  [data-reveal='pending'],
+  [data-reveal='visible'],
+  main.public-site a,
+  main.public-site button,
+  .site-header *,
+  .site-footer * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
