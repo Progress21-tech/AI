@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     locale: 'en_NG',
     type: 'website',
   },
-  icons: { icon: '/probetech-mark.svg' },
+  icons: { icon: { url: '/favicon.svg', type: 'image/svg+xml' } },
 };
 
 export default function RootLayout({
