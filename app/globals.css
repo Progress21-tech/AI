@@ -33,3 +33,56 @@ body {
   color: #FFFFFF;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+/* Public marketing pages share this compact type scale; admin screens are unaffected. */
+main.public-site h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+@media (min-width: 640px) {
+  main.public-site h1 { font-size: 2.5rem; }
+}
+
+main.public-site h2:not(.site-eyebrow) {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+main.public-site h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+main.public-site h2.site-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--subtle);
+}
+
+main.public-site h1 + p,
+main.public-site h2 + p {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.75rem;
+  letter-spacing: normal;
+  color: var(--subtle);
+}
+
+main.public-site p.text-base { font-size: 0.875rem; }
+main.public-site p.text-lg { font-size: 1rem; }
+main.public-site p.text-xs { font-size: 0.6875rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  main.public-site *,
+  header *,
+  footer * { scroll-behavior: auto !important; }
+}

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const principles = ['Problem first, technology second.', 'Reliable beats impressive.', 'Honest about what we can and can’t do.'];
 
 export default function AboutPage() {
-  return <><SiteHeader /><main>
+  return <><SiteHeader /><main className="public-site">
     <section className="mx-auto max-w-6xl px-6 py-16 sm:py-24">
       <div className="max-w-3xl">
         <p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">About ProbeTech</p>

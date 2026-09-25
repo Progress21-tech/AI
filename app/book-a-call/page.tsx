@@ -13,7 +13,7 @@ export default function BookCallPage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto grid max-w-6xl gap-12 px-6 py-14 sm:py-20 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
+      <main className="public-site mx-auto grid max-w-6xl gap-12 px-6 py-14 sm:py-20 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
         <div>
           <div className="mb-9 max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">Book a discovery call</p>

@@ -19,7 +19,7 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
   return (
     <>
       <SiteHeader />
-      <main>
+      <main className="public-site">
         <section className="mx-auto max-w-6xl px-6 py-16 sm:py-24">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">ProbeTech services</p>
@@ -31,7 +31,7 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
 
         <section className="border-y border-black/10 bg-surface">
           <div className="mx-auto grid max-w-6xl gap-4 px-6 py-12 sm:grid-cols-[12rem_1fr] sm:gap-8 sm:py-14">
-            <h2 className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">The problem</h2>
+            <h2 className="site-eyebrow">The problem</h2>
             <p className="max-w-3xl text-lg leading-8">{content.problem}</p>
           </div>
         </section>

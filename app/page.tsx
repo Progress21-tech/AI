@@ -35,7 +35,7 @@ export default async function HomePage() {
   return (
     <>
       <SiteHeader />
-      <main>
+      <main className="public-site">
         <section className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
           <div className="max-w-3xl">
             <p className="text-sm font-medium text-subtle">Web development and AI studio · Lagos, Nigeria</p>

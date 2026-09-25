@@ -42,7 +42,7 @@ export default function ServicesPage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-6xl px-6 py-16 sm:py-24">
+      <main className="public-site mx-auto max-w-6xl px-6 py-16 sm:py-24">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">Services</p>
           <h1 className="mt-3 text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">Three ways we take work off your plate.</h1>

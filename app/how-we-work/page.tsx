@@ -37,7 +37,7 @@ export default function HowWeWorkPage() {
   return (
     <>
       <SiteHeader />
-      <main>
+      <main className="public-site">
         <section className="mx-auto max-w-6xl px-6 py-16 sm:py-24">
           <p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">How we work</p>
           <h1 className="mt-3 text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">Clear steps. No surprises.</h1>
