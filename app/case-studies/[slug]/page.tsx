@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function WorkDetailPage({ params }: { params: { slug: string } }) {
   const study = (await getPublishedCaseStudies()).find((item) => item.slug === params.slug);
   if (!study) notFound();
-  return <><SiteHeader /><main className="mx-auto max-w-6xl px-6 py-14 sm:py-20">
+  return <><SiteHeader /><main className="public-site mx-auto max-w-6xl px-6 py-14 sm:py-20">
     <article className="mx-auto max-w-4xl">
       <p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">{serviceLabels[study.service_type]}</p>
       <h1 className="mt-3 text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">{study.project_title}</h1>

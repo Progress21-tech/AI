@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { SiteHeader } from '@/components/site/SiteHeader';
+import { Reveal } from '@/components/site/Reveal';
 
 export const metadata: Metadata = {
   title: 'Services | ProbeTech',
@@ -49,7 +50,7 @@ export default function ServicesPage() {
           <p className="mt-5 text-lg leading-8 text-subtle">Every engagement starts with a discovery call. We’ll tell you honestly which of these, if any, fits your problem.</p>
         </div>
 
-        <div className="mt-12 divide-y divide-black/10 border-y border-black/10">
+        <Reveal className="mt-12 divide-y divide-black/10 border-y border-black/10">
           {services.map((service) => (
             <article key={service.number} className="grid gap-5 py-8 md:grid-cols-[5rem_1fr_1fr] md:gap-8">
               <span className="font-mono text-xs text-subtle">{service.number}</span>
@@ -61,7 +62,7 @@ export default function ServicesPage() {
               <p className="self-start rounded-xl bg-surface p-5 text-sm leading-6"><span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-subtle">Good fit if</span>{service.fit}</p>
             </article>
           ))}
-        </div>
+        </Reveal>
 
         <section className="mt-14 flex flex-col items-start justify-between gap-5 rounded-2xl border border-black/10 p-6 sm:flex-row sm:items-center sm:p-8">
           <div>

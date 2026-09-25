@@ -39,7 +39,7 @@ export default async function InsightArticlePage({ params }: { params: { slug: s
   const canonical = absoluteSiteUrl(`/blogs/${post.slug}`);
   const image = post.cover_image_url ? imageSourceAndAlt(post.cover_image_url, post.title) : null;
   const schema = { '@context': 'https://schema.org', '@type': 'Article', headline: post.title, description: post.seo_description || post.excerpt, datePublished: post.published_at, dateModified: post.updated_at, author: { '@type': 'Person', name: post.author }, mainEntityOfPage: canonical, image: image?.src };
-  return <><SiteHeader /><main className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
+  return <><SiteHeader /><main className="public-site mx-auto max-w-6xl px-6 py-12 sm:py-16">
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(schema) }} />
     <article className="mx-auto max-w-3xl">
       <p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">{post.category}</p>

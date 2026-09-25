@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { SiteHeader } from '@/components/site/SiteHeader';
+import { Reveal } from '@/components/site/Reveal';
 import { estimateReadMinutes } from '@/lib/content/markdown';
 import { getPublishedCaseStudies, getPublishedPosts } from '@/lib/content/data';
 
@@ -64,7 +65,7 @@ export default async function HomePage() {
             </div>
             <Link href="/services" className="inline-flex items-center gap-2 text-sm font-medium underline underline-offset-4">Explore services <ArrowRight className="h-4 w-4" /></Link>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
+          <Reveal className="grid gap-4 md:grid-cols-3">
             {services.map((service) => (
               <Link key={service.href} href={service.href} className="group rounded-2xl border border-black/10 p-6 transition hover:border-black/30">
                 <h3 className="text-lg font-semibold tracking-tight">{service.title}</h3>
@@ -72,7 +73,7 @@ export default async function HomePage() {
                 <span className="mt-5 inline-flex items-center gap-2 text-sm font-medium">Learn more <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span>
               </Link>
             ))}
-          </div>
+          </Reveal>
         </section>
 
         <section className="border-y border-black/10 bg-surface">
