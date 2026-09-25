@@ -39,8 +39,7 @@ export default async function HomePage() {
       <main className="public-site">
         <section className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
           <div className="max-w-3xl">
-            <p className="text-sm font-medium text-subtle">Web development and AI studio · Lagos, Nigeria</p>
-            <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">Your business has problems. We build the systems that fix them.</h1>
+            <h1 className="text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">Your business has problems. We build the systems that fix them.</h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-subtle">ProbeTech designs AI automations, chatbots, and custom software for growing businesses. We start by understanding the problem, not by selling a solution.</p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link href="/book-a-call" className="inline-flex items-center gap-2 rounded-xl bg-black px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-black/80">Book a Discovery Call <ArrowRight className="h-4 w-4" /></Link>
