@@ -40,7 +40,7 @@ export async function savePost(form: FormData) {
     : await supabase.from('posts').insert(post).select('id').single();
   if (result.error || !result.data) redirect(`/admin/posts${id ? `/${id}` : '/new'}?error=save`);
   revalidateTag('content');
-  revalidatePath('/'); revalidatePath('/insights'); revalidatePath('/insights/[slug]', 'page'); revalidatePath(`/insights/${slug}`); if (existing.data?.slug) revalidatePath(`/insights/${existing.data.slug}`); revalidatePath('/sitemap.xml');
+  revalidatePath('/'); revalidatePath('/blogs'); revalidatePath('/blogs/[slug]', 'page'); revalidatePath(`/blogs/${slug}`); if (existing.data?.slug) revalidatePath(`/blogs/${existing.data.slug}`); revalidatePath('/sitemap.xml');
   redirect(`/admin/posts/${result.data.id}?saved=1`);
 }
 
@@ -52,6 +52,6 @@ export async function deletePost(form: FormData) {
   const { data: post } = await supabase.from('posts').select('slug').eq('id', id).maybeSingle();
   const { error } = await supabase.from('posts').delete().eq('id', id);
   if (error) redirect(`/admin/posts/${id}?error=delete`);
-  revalidateTag('content'); revalidatePath('/'); revalidatePath('/insights'); revalidatePath('/insights/[slug]', 'page'); if (post?.slug) revalidatePath(`/insights/${post.slug}`); revalidatePath('/sitemap.xml');
+  revalidateTag('content'); revalidatePath('/'); revalidatePath('/blogs'); revalidatePath('/blogs/[slug]', 'page'); if (post?.slug) revalidatePath(`/blogs/${post.slug}`); revalidatePath('/sitemap.xml');
   redirect('/admin/posts?deleted=1');
 }

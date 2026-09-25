@@ -1,6 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    return [
+      { source: '/insights/rss.xml', destination: '/blogs/rss.xml', permanent: true },
+      { source: '/insights', destination: '/blogs', permanent: true },
+      { source: '/insights/:slug', destination: '/blogs/:slug', permanent: true },
+      { source: '/work', destination: '/case-studies', permanent: true },
+      { source: '/work/:slug', destination: '/case-studies/:slug', permanent: true },
+    ];
+  },
   images: {
     remotePatterns: [
       {

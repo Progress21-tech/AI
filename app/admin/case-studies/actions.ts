@@ -54,7 +54,7 @@ export async function saveCaseStudy(form: FormData) {
     ? await supabase.from('case_studies').update(study).eq('id', id).select('id').single()
     : await supabase.from('case_studies').insert(study).select('id').single();
   if (result.error || !result.data) redirect(`/admin/case-studies${id ? `/${id}` : '/new'}?error=save`);
-  revalidateTag('content'); revalidatePath('/'); revalidatePath('/work'); revalidatePath('/work/[slug]', 'page'); revalidatePath(`/work/${slug}`); if (existing.data?.slug) revalidatePath(`/work/${existing.data.slug}`); revalidatePath('/sitemap.xml');
+  revalidateTag('content'); revalidatePath('/'); revalidatePath('/case-studies'); revalidatePath('/case-studies/[slug]', 'page'); revalidatePath(`/case-studies/${slug}`); if (existing.data?.slug) revalidatePath(`/case-studies/${existing.data.slug}`); revalidatePath('/sitemap.xml');
   redirect(`/admin/case-studies/${result.data.id}?saved=1`);
 }
 
@@ -66,6 +66,6 @@ export async function deleteCaseStudy(form: FormData) {
   const { data: study } = await supabase.from('case_studies').select('slug').eq('id', id).maybeSingle();
   const { error } = await supabase.from('case_studies').delete().eq('id', id);
   if (error) redirect(`/admin/case-studies/${id}?error=delete`);
-  revalidateTag('content'); revalidatePath('/'); revalidatePath('/work'); revalidatePath('/work/[slug]', 'page'); if (study?.slug) revalidatePath(`/work/${study.slug}`); revalidatePath('/sitemap.xml');
+  revalidateTag('content'); revalidatePath('/'); revalidatePath('/case-studies'); revalidatePath('/case-studies/[slug]', 'page'); if (study?.slug) revalidatePath(`/case-studies/${study.slug}`); revalidatePath('/sitemap.xml');
   redirect('/admin/case-studies?deleted=1');
 }

@@ -15,7 +15,7 @@ export async function generateStaticParams() { return (await getPublishedCaseStu
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const study = (await getPublishedCaseStudies()).find((item) => item.slug === params.slug);
   if (!study) return { title: 'Work example not found | ProbeTech', robots: { index: false, follow: false } };
-  const canonical = absoluteSiteUrl(`/work/${study.slug}`);
+  const canonical = absoluteSiteUrl(`/case-studies/${study.slug}`);
   const firstImage = study.screenshots[0] ? imageSourceAndAlt(study.screenshots[0], study.project_title).src : undefined;
   return {
     title: study.seo_title || `${study.project_title} | ProbeTech Work`,

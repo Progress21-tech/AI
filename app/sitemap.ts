@@ -14,9 +14,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: absoluteSiteUrl('/how-we-work'), changeFrequency: 'monthly', priority: 0.8 },
     { url: absoluteSiteUrl('/book-a-call'), changeFrequency: 'monthly', priority: 0.9 },
   ];
-  if (posts.length) pages.push({ url: absoluteSiteUrl('/insights'), changeFrequency: 'weekly', priority: 0.7 });
-  if (work.length) pages.push({ url: absoluteSiteUrl('/work'), changeFrequency: 'monthly', priority: 0.7 });
-  pages.push(...posts.map((post) => ({ url: absoluteSiteUrl(`/insights/${post.slug}`), lastModified: new Date(post.updated_at), changeFrequency: 'monthly' as const, priority: 0.6 })));
-  pages.push(...work.map((study) => ({ url: absoluteSiteUrl(`/work/${study.slug}`), lastModified: new Date(study.updated_at), changeFrequency: 'monthly' as const, priority: 0.6 })));
+  if (posts.length) pages.push({ url: absoluteSiteUrl('/blogs'), changeFrequency: 'weekly', priority: 0.7 });
+  if (work.length) pages.push({ url: absoluteSiteUrl('/case-studies'), changeFrequency: 'monthly', priority: 0.7 });
+  pages.push(...posts.map((post) => ({ url: absoluteSiteUrl(`/blogs/${post.slug}`), lastModified: new Date(post.updated_at), changeFrequency: 'monthly' as const, priority: 0.6 })));
+  pages.push(...work.map((study) => ({ url: absoluteSiteUrl(`/case-studies/${study.slug}`), lastModified: new Date(study.updated_at), changeFrequency: 'monthly' as const, priority: 0.6 })));
   return pages;
 }

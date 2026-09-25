@@ -12,8 +12,8 @@ export async function GET() {
   const items = posts.map((post) => `
     <item>
       <title>${escapeXml(post.title)}</title>
-      <link>${absoluteSiteUrl(`/insights/${post.slug}`)}</link>
-      <guid isPermaLink="true">${absoluteSiteUrl(`/insights/${post.slug}`)}</guid>
+      <link>${absoluteSiteUrl(`/blogs/${post.slug}`)}</link>
+      <guid isPermaLink="true">${absoluteSiteUrl(`/blogs/${post.slug}`)}</guid>
       <description>${escapeXml(post.excerpt)}</description>
       <category>${escapeXml(post.category)}</category>
       <pubDate>${new Date(post.published_at || post.created_at).toUTCString()}</pubDate>
@@ -21,8 +21,8 @@ export async function GET() {
     </item>`).join('');
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel>
-    <title>ProbeTech Insights</title>
-    <link>${absoluteSiteUrl('/insights')}</link>
+    <title>ProbeTech Blogs</title>
+    <link>${absoluteSiteUrl('/blogs')}</link>
     <description>Findings and practical advice drawn from real conversations with business owners.</description>
     <language>en-ng</language>${items}
   </channel></rss>`;

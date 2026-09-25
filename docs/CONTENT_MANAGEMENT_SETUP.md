@@ -20,6 +20,6 @@ After the content migration is present, run `supabase/seeds/20260925_content_dra
 
 ## Publishing and cache behavior
 
-Public queries filter to published posts and to published, client-approved case studies. Case-study publication is checked by both the editor action and a database constraint. Content is cached for up to five minutes; saving or deleting content also invalidates the public pages and sitemap. Draft items are excluded from the public nav, home previews, RSS feed, and sitemap. Empty listing sections return 404.
+Public queries filter to published posts and to published, client-approved case studies. Case-study publication is checked by both the editor action and a database constraint. Content is cached for up to five minutes; saving or deleting content also invalidates the public pages and sitemap. Draft items are excluded from the public nav, home previews, RSS feed, and sitemap. Empty listing sections return 404. The canonical public paths are `/blogs` and `/case-studies`; `/insights` and `/work` redirect to those paths for compatibility.
 
 Markdown is stored as plain text. The renderer supports headings, paragraphs, lists, block quotes, inline emphasis, links, and fenced code blocks. Raw HTML is rendered as text, and links with unsafe protocols are not made clickable.
