@@ -3,31 +3,31 @@ import { SignOutButton } from '@/components/auth/SignOutButton';
 
 export function AdminShell({ children, title, description }: { children: React.ReactNode; title: string; description: string }) {
     return (
-        <main className="min-h-screen bg-[#f7f8fa] text-black">
-            <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+        <main className="min-h-screen min-w-0 bg-[#f7f8fa] text-black">
+            <div className="mx-auto w-full min-w-0 max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
                 <header className="border-b border-black/10 pb-5">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                         <div>
                             <Link href="/admin" className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-subtle">Admin control center</Link>
-                            <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
-                            <p className="mt-2 max-w-2xl text-sm text-subtle">{description}</p>
+                            <h1 className="mt-2 break-words text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
+                            <p className="mt-2 max-w-2xl break-words text-sm text-subtle">{description}</p>
                         </div>
-                        <div className="flex items-center gap-3 text-xs">
+                        <div className="flex flex-wrap items-center gap-3 text-xs">
                             <span className="rounded-full border border-black/10 bg-white px-3 py-1.5 font-medium">Restricted workspace</span>
                             <SignOutButton />
                         </div>
                     </div>
-                    <nav className="mt-6 flex flex-wrap gap-2 text-sm">
+                    <nav aria-label="Admin navigation" className="mt-6 flex flex-wrap gap-2 text-sm">
                         {[
                             ['/admin', 'Overview'],
                             ['/admin/companies', 'Companies'],
                             ['/admin/interviews', 'Interviews'],
                             ['/admin/posts', 'Posts'],
                             ['/admin/case-studies', 'Case Studies'],
-                        ].map(([href, label]) => <Link key={href} href={href} className="rounded-lg border border-black/10 bg-white px-3 py-2 transition hover:border-black hover:bg-black hover:text-white">{label}</Link>)}
+                        ].map(([href, label]) => <Link key={href} href={href} className="inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg border border-black/10 bg-white px-3 py-2 transition hover:border-black hover:bg-black hover:text-white">{label}</Link>)}
                     </nav>
                 </header>
-                <div className="py-7">{children}</div>
+                <div className="min-w-0 py-7">{children}</div>
             </div>
         </main>
     );
@@ -44,7 +44,7 @@ export function MetricCard({ label, value, detail }: { label: string; value: num
 }
 
 export function SectionHeading({ eyebrow, title, action }: { eyebrow?: string; title: string; action?: React.ReactNode }) {
-    return <div className="mb-4 flex flex-wrap items-end justify-between gap-3"><div>{eyebrow && <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-subtle">{eyebrow}</p>}<h2 className="mt-1 text-xl font-semibold tracking-tight">{title}</h2></div>{action}</div>;
+    return <div className="mb-4 flex min-w-0 flex-wrap items-end justify-between gap-3"><div className="min-w-0">{eyebrow && <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-subtle">{eyebrow}</p>}<h2 className="mt-1 break-words text-xl font-semibold tracking-tight">{title}</h2></div>{action && <div className="min-w-0 max-w-full">{action}</div>}</div>;
 }
 
 export function Info({ label, value }: { label: string; value: unknown }) {
