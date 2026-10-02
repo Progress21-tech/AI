@@ -36,7 +36,7 @@ export default async function HomePage() {
     <>
       <SiteHeader />
       <main className="public-site">
-        <section className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+        <section className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 py-20 sm:py-28 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] md:gap-8">
           <div className="max-w-3xl">
             <h1 className="text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">Your business has problems. We build the systems that fix them.</h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-subtle">ProbeTech designs AI automations, chatbots, and custom software for growing businesses. We start by understanding the problem, not by selling a solution.</p>
@@ -46,7 +46,7 @@ export default async function HomePage() {
             </div>
             <p className="mt-4 text-sm text-subtle">Free 30-minute call. No commitment.</p>
           </div>
-          <div className="hero-image-window mt-12" role="img" aria-label="Three image placeholders scrolling from right to left">
+          <div className="hero-image-window mt-2 md:mt-0" role="img" aria-label="Three image placeholders scrolling from right to left">
             <div className="hero-image-track" aria-hidden="true">
               {[0, 1].map((set) => (
                 <div key={set} className="hero-image-set">
