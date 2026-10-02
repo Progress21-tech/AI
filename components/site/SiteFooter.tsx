@@ -17,14 +17,16 @@ export function SiteFooter() {
               <span className="text-xs font-semibold uppercase tracking-[.16em] text-white/50">Media</span>
               <Link href="/case-studies" className="hover:text-white">Case Studies</Link>
               <Link href="/blogs" className="hover:text-white">Blog</Link>
-              <Link href="/privacy-policy" className="hover:text-white">Privacy Policy</Link>
-              <Link href="/terms-of-service" className="hover:text-white">Terms of Service</Link>
             </div>
             <Link href="/book-a-call" className="col-span-2 justify-self-start rounded-lg bg-white px-4 py-3 font-semibold text-black transition-colors duration-200 hover:bg-white/85 motion-reduce:transition-none">Book a Discovery Call</Link>
           </nav>
         </div>
         <p className="site-tagline mt-12 w-full leading-[1.02] tracking-tight">Systems that solve real business problems.</p>
-        <p className="mt-8 text-center text-xs text-white/60">© 2026 ProbeTech. All rights reserved.</p>
+        <div className="mt-8 grid grid-cols-1 items-center gap-3 text-center text-xs text-white/60 sm:grid-cols-3 sm:gap-4">
+          <p>© 2026 ProbeTech. All rights reserved.</p>
+          <Link href="/privacy-policy" className="justify-self-center transition-colors hover:text-white">Privacy Policy</Link>
+          <Link href="/terms-of-service" className="justify-self-center transition-colors hover:text-white">Terms of Service</Link>
+        </div>
       </div>
     </footer>
   );

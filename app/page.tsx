@@ -46,6 +46,15 @@ export default async function HomePage() {
             </div>
             <p className="mt-4 text-sm text-subtle">Free 30-minute call. No commitment.</p>
           </div>
+          <div className="hero-image-window mt-12" role="img" aria-label="Three image placeholders scrolling from right to left">
+            <div className="hero-image-track" aria-hidden="true">
+              {[0, 1].map((set) => (
+                <div key={set} className="hero-image-set">
+                  {[1, 2, 3].map((image) => <div key={image} className="hero-image-placeholder" />)}
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
 
         <section className="border-y border-black/10 bg-surface">
