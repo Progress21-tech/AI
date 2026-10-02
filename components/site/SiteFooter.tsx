@@ -1,9 +1,7 @@
 import Link from 'next/link';
-import { getPublishedCaseStudies, getPublishedPosts } from '@/lib/content/data';
 import { BrandLockup } from '@/components/site/BrandLockup';
 
-export async function SiteFooter() {
-  const [posts, work] = await Promise.all([getPublishedPosts(), getPublishedCaseStudies()]);
+export function SiteFooter() {
   return (
     <footer className="site-footer border-t border-white/15 bg-black text-white">
       <div className="mx-auto max-w-6xl px-6 py-10 sm:py-12">
@@ -16,8 +14,9 @@ export async function SiteFooter() {
               <Link href="/how-we-work" className="hover:text-white">How We Work</Link>
             </div>
             <div className="flex flex-col items-start gap-3">
-              {work.length > 0 && <Link href="/case-studies" className="hover:text-white">Case Studies</Link>}
-              {posts.length > 0 && <Link href="/blogs" className="hover:text-white">Blog</Link>}
+              <span className="text-xs font-semibold uppercase tracking-[.16em] text-white/50">Media</span>
+              <Link href="/case-studies" className="hover:text-white">Case Studies</Link>
+              <Link href="/blogs" className="hover:text-white">Blog</Link>
               <Link href="/privacy-policy" className="hover:text-white">Privacy Policy</Link>
               <Link href="/terms-of-service" className="hover:text-white">Terms of Service</Link>
             </div>
