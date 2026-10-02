@@ -37,16 +37,16 @@ export default async function HomePage() {
       <SiteHeader />
       <main className="public-site">
         <section className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 py-20 sm:py-28 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] md:gap-8">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl md:col-start-1 md:row-start-1">
             <h1 className="text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">Your business has problems. We build the systems that fix them.</h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-subtle">ProbeTech designs AI automations, chatbots, and custom software for growing businesses. We start by understanding the problem, not by selling a solution.</p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link href="/book-a-call" className="inline-flex items-center gap-2 rounded-xl bg-black px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-black/80">Book a Discovery Call <ArrowRight className="h-4 w-4" /></Link>
-              <Link href="/how-we-work" className="rounded-xl border border-black/15 px-5 py-3.5 text-sm font-semibold transition hover:border-black">See how we work</Link>
-            </div>
-            <p className="mt-4 text-sm text-subtle">Free 30-minute call. No commitment.</p>
           </div>
-          <div className="hero-image-window mt-2 md:mt-0" role="img" aria-label="Three image placeholders scrolling from right to left">
+          <div className="mt-8 flex flex-wrap items-center gap-3 md:col-start-1 md:row-start-2 md:mt-0">
+            <Link href="/book-a-call" className="inline-flex items-center gap-2 rounded-xl bg-black px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-black/80">Book a Discovery Call <ArrowRight className="h-4 w-4" /></Link>
+            <Link href="/how-we-work" className="rounded-xl border border-black/15 px-5 py-3.5 text-sm font-semibold transition hover:border-black">See how we work</Link>
+          </div>
+          <p className="text-sm text-subtle md:col-start-1 md:row-start-3">Free 30-minute call. No commitment.</p>
+          <div className="hero-image-window mt-2 md:col-start-2 md:row-start-1 md:mt-0 md:self-stretch" role="img" aria-label="Three image placeholders scrolling from right to left">
             <div className="hero-image-track" aria-hidden="true">
               {[0, 1].map((set) => (
                 <div key={set} className="hero-image-set">

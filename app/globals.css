@@ -104,6 +104,7 @@ main.public-site p.text-xs { font-size: 0.6875rem; line-height: 1.4; }
 .hero-image-window {
   overflow: hidden;
   width: 100%;
+  min-height: 10rem;
   mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
 }
 
@@ -112,10 +113,12 @@ main.public-site p.text-xs { font-size: 0.6875rem; line-height: 1.4; }
   display: flex;
   width: max-content;
   gap: 1rem;
+  height: 100%;
 }
 
 .hero-image-track {
   animation: hero-image-scroll 24s linear infinite;
+  align-items: stretch;
 }
 
 .hero-image-set {
@@ -124,11 +127,16 @@ main.public-site p.text-xs { font-size: 0.6875rem; line-height: 1.4; }
 
 .hero-image-placeholder {
   width: clamp(12rem, 25vw, 19rem);
-  aspect-ratio: 4 / 3;
+  height: clamp(10rem, 38vw, 16rem);
   flex: none;
   border: 1px solid rgba(0, 0, 0, 0.09);
   border-radius: 1.25rem;
   background: linear-gradient(145deg, #f5f5f5, #ebebeb);
+}
+
+@media (min-width: 768px) {
+  .hero-image-window { min-height: 0; }
+  .hero-image-placeholder { height: 100%; }
 }
 
 @keyframes hero-image-scroll {
