@@ -106,7 +106,7 @@ export default async function HomePage() {
 
         <section id="media" className="border-y border-black/10 bg-surface">
           <div className="mx-auto max-w-6xl px-6 py-14 sm:py-16">
-            <div className="mb-7"><p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">Media</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">Case studies and blog</h2></div>
+            <div className="mb-7"><p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">Resources</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">Case studies and blog</h2></div>
             <div className="grid gap-4 md:grid-cols-2">
               <Link href="/case-studies" className="rounded-2xl border border-black/10 bg-white p-6 transition hover:border-black/30">
                 <p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">{work.length ? 'Explore' : 'Coming soon'}</p>

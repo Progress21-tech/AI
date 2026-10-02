@@ -14,7 +14,7 @@ export function SiteFooter() {
               <Link href="/how-we-work" className="hover:text-white">How We Work</Link>
             </div>
             <div className="flex flex-col items-start gap-3">
-              <span className="text-xs font-semibold uppercase tracking-[.16em] text-white/50">Media</span>
+              <span className="text-xs font-semibold uppercase tracking-[.16em] text-white/50">Resources</span>
               <Link href="/case-studies" className="hover:text-white">Case Studies</Link>
               <Link href="/blogs" className="hover:text-white">Blog</Link>
             </div>

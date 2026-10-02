@@ -45,7 +45,7 @@ export function SiteNavigation() {
     <nav aria-label="Main navigation" className="hidden items-center gap-5 text-sm lg:flex">
       {links.map((link) => <Link key={link.href} className={linkStyle} href={link.href}>{link.label}</Link>)}
       <details className="group relative">
-        <summary className={`${linkStyle} flex cursor-pointer list-none items-center gap-1 [&::-webkit-details-marker]:hidden`}>Media <span aria-hidden="true" className="text-xs transition-transform group-open:rotate-180 motion-reduce:transition-none">⌄</span></summary>
+        <summary className={`${linkStyle} flex cursor-pointer list-none items-center gap-1 [&::-webkit-details-marker]:hidden`}>Resources <span aria-hidden="true" className="text-xs transition-transform group-open:rotate-180 motion-reduce:transition-none">⌄</span></summary>
         <div className="absolute right-0 top-full z-50 mt-3 flex min-w-44 flex-col gap-1 rounded-xl border border-black/10 bg-white p-2 shadow-lg">
           <Link className="rounded-lg px-3 py-2.5 text-sm text-subtle transition-colors hover:bg-surface hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-black" href="/case-studies">Case Studies</Link>
           <Link className="rounded-lg px-3 py-2.5 text-sm text-subtle transition-colors hover:bg-surface hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-black" href="/blogs">Blog</Link>
@@ -66,7 +66,7 @@ export function SiteNavigation() {
         <motion.div ref={panelRef} id="mobile-navigation" role="dialog" aria-modal="true" aria-label="Site navigation" className="absolute inset-y-0 right-0 flex w-[min(88vw,24rem)] flex-col bg-white px-6 pb-8 pt-24 shadow-2xl" initial={reduceMotion ? false : { x: '100%' }} animate={{ x: 0 }} exit={{ x: reduceMotion ? 0 : '100%' }} transition={{ duration: reduceMotion ? 0 : 0.2, ease: 'easeOut' }}>
           <nav aria-label="Mobile navigation" className="flex flex-col items-stretch gap-1">
             {links.map((link) => <Link key={link.href} href={link.href} onClick={close} className="rounded-lg px-3 py-3.5 text-base text-black transition-colors duration-200 hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-black motion-reduce:transition-none">{link.label}</Link>)}
-            <p className="px-3 pb-1 pt-3 text-xs font-semibold uppercase tracking-[.16em] text-subtle">Media</p>
+            <p className="px-3 pb-1 pt-3 text-xs font-semibold uppercase tracking-[.16em] text-subtle">Resources</p>
             <Link href="/case-studies" onClick={close} className="rounded-lg px-3 py-3.5 pl-6 text-base text-black transition-colors duration-200 hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-black motion-reduce:transition-none">Case Studies</Link>
             <Link href="/blogs" onClick={close} className="rounded-lg px-3 py-3.5 pl-6 text-base text-black transition-colors duration-200 hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-black motion-reduce:transition-none">Blog</Link>
             <Link href="/book-a-call" onClick={close} className={`${ctaStyle} mt-4 w-full`}>Book a Discovery Call</Link>
