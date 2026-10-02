@@ -27,7 +27,7 @@ export default function BookCallPage() {
           <ul className="mt-4 space-y-4 text-sm leading-6 text-subtle">
             <li>A relaxed conversation, not a sales pitch</li>
             <li>Honest advice, even if it’s “you don’t need us”</li>
-            <li>A written proposal within [X] days if there’s a fit</li>
+            <li>A written proposal within 3 days if there’s a fit</li>
           </ul>
         </aside>
       </main>

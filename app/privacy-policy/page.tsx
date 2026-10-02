@@ -29,7 +29,7 @@ export default function PrivacyPolicyPage() {
       <div className="mt-12 divide-y divide-black/10 border-y border-black/10">
         {sections.map((section) => <section key={section.title} className="grid gap-4 py-7 sm:grid-cols-[12rem_1fr] sm:gap-8"><h2 className="font-semibold tracking-tight">{section.title}</h2><p className="max-w-3xl text-sm leading-7 text-subtle">{section.body}</p></section>)}
       </div>
-      <p className="mt-8 text-sm text-subtle">[PLACEHOLDER: final legal review needed before this page goes live]</p>
+      <p className="mt-8 text-sm text-subtle">NB: final legal review needed before this page goes live</p>
     </main>
     <SiteFooter />
   </>;

@@ -24,7 +24,7 @@ export async function SiteFooter() {
             <Link href="/book-a-call" className="col-span-2 justify-self-start rounded-lg bg-white px-4 py-3 font-semibold text-black transition-colors duration-200 hover:bg-white/85 motion-reduce:transition-none">Book a Discovery Call</Link>
           </nav>
         </div>
-        <p className="mt-12 w-full text-[clamp(2.5rem,5.2vw,4rem)] font-semibold leading-[1.02] tracking-tight">Systems that solve real business problems.</p>
+        <p className="site-tagline mt-12 w-full leading-[1.02] tracking-tight">Systems that solve real business problems.</p>
         <p className="mt-8 text-center text-xs text-white/60">© 2026 ProbeTech. All rights reserved.</p>
       </div>
     </footer>
