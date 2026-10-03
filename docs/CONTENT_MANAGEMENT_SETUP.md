@@ -1,6 +1,8 @@
 # ProbeTech content management
 
-The Insights and Work content lives in Supabase, so creating or publishing an item does not require a deployment. Apply `supabase/migrations/202609250001_create_content_tables.sql` before using the admin sections. The rollback file removes both new tables and their content; do not run it after creating content unless that data can be discarded.
+The Insights and Work content lives in Supabase, so creating or publishing an item does not require a deployment. Apply `supabase/migrations/202609250001_create_content_tables.sql` before using the admin sections. Apply later migrations in timestamp order as well. The rollback file removes both new tables and their content; do not run it after creating content unless that data can be discarded.
+
+Case studies support a long-form Markdown project overview through `supabase/migrations/202610030001_add_case_study_project_overview.sql`. To create the supplied MediConnect outreach automation draft, run `supabase/seeds/20261003_mediconnect_outreach_automation.sql` after applying that migration. The seed leaves the record unpublished and unapproved; review it in the admin before changing its publication status.
 
 ## Admin access
 

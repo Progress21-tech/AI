@@ -28,6 +28,7 @@ export async function saveCaseStudy(form: FormData) {
     client_name: field(form, 'client_name') || null,
     project_title: projectTitle,
     summary: field(form, 'summary'),
+    project_overview: field(form, 'project_overview'),
     problem: field(form, 'problem'), solution: field(form, 'solution'),
     tech_used: field(form, 'tech_used').split(',').map((item) => item.trim()).filter(Boolean),
     result: field(form, 'result') || null,
@@ -42,10 +43,10 @@ export async function saveCaseStudy(form: FormData) {
     seo_title: field(form, 'seo_title') || null,
     seo_description: field(form, 'seo_description') || null,
   };
-  const withinLimits = projectTitle.length <= 180 && slug.length <= 90 && study.summary.length <= 300 && study.problem.length <= 20000 && study.solution.length <= 20000 && study.tech_used.length <= 25 && study.tech_used.every((item) => item.length <= 80) && (study.client_name?.length ?? 0) <= 120 && (study.result?.length ?? 0) <= 20000 && (study.testimonial_quote?.length ?? 0) <= 3000 && (study.testimonial_author?.length ?? 0) <= 120 && (study.testimonial_role?.length ?? 0) <= 120 && study.screenshots.length <= 30 && study.screenshots.every((item) => item.length <= 2048) && (study.seo_title?.length ?? 0) <= 180 && (study.seo_description?.length ?? 0) <= 300;
+  const withinLimits = projectTitle.length <= 180 && slug.length <= 90 && study.summary.length <= 300 && study.project_overview.length <= 150000 && study.problem.length <= 20000 && study.solution.length <= 20000 && study.tech_used.length <= 25 && study.tech_used.every((item) => item.length <= 80) && (study.client_name?.length ?? 0) <= 120 && (study.result?.length ?? 0) <= 20000 && (study.testimonial_quote?.length ?? 0) <= 3000 && (study.testimonial_author?.length ?? 0) <= 120 && (study.testimonial_role?.length ?? 0) <= 120 && study.screenshots.length <= 30 && study.screenshots.every((item) => item.length <= 2048) && (study.seo_title?.length ?? 0) <= 180 && (study.seo_description?.length ?? 0) <= 300;
   if (!projectTitle || !slug || !study.summary || !['automation', 'chatbot', 'custom_software'].includes(serviceType) || !['draft', 'published'].includes(status) || !withinLimits) redirect(`/admin/case-studies${id ? `/${id}` : '/new'}?error=required`);
   if (status === 'published' && !approved) redirect(`/admin/case-studies${id ? `/${id}` : '/new'}?error=approval`);
-  if (status === 'published' && (!study.problem || !study.solution)) redirect(`/admin/case-studies${id ? `/${id}` : '/new'}?error=required`);
+  if (status === 'published' && !study.project_overview && (!study.problem || !study.solution)) redirect(`/admin/case-studies${id ? `/${id}` : '/new'}?error=required`);
   let duplicateQuery = supabase.from('case_studies').select('id').eq('slug', slug);
   if (id) duplicateQuery = duplicateQuery.neq('id', id);
   const { data: duplicate } = await duplicateQuery.maybeSingle();

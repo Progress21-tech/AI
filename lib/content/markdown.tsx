@@ -30,6 +30,7 @@ export function MarkdownContent({ source, className = '' }: { source: string; cl
   let paragraph: string[] = [];
   let code: string[] | null = null;
   let list: { ordered: boolean; items: string[] } | null = null;
+  let tableRows: string[][] | null = null;
 
   const flushParagraph = () => {
     if (paragraph.length) blocks.push(<p key={`p-${blocks.length}`}>{inline(paragraph.join(' '))}</p>);
@@ -41,10 +42,23 @@ export function MarkdownContent({ source, className = '' }: { source: string; cl
     blocks.push(<Tag key={`list-${blocks.length}`} className={list.ordered ? 'list-decimal' : 'list-disc'}>{list.items.map((item, index) => <li key={index}>{inline(item)}</li>)}</Tag>);
     list = null;
   };
+  const flushTable = () => {
+    if (!tableRows?.length) return;
+    const [header, ...rows] = tableRows;
+    blocks.push(
+      <div key={`table-${blocks.length}`} className="max-w-full overflow-x-auto rounded-xl border border-black/10">
+        <table className="min-w-full divide-y divide-black/10 text-left text-sm">
+          <thead className="bg-surface"><tr>{header.map((cell, index) => <th key={index} className="px-4 py-3 font-semibold text-black">{inline(cell)}</th>)}</tr></thead>
+          <tbody className="divide-y divide-black/10">{rows.map((row, rowIndex) => <tr key={rowIndex}>{header.map((_, cellIndex) => <td key={cellIndex} className="px-4 py-3 align-top">{inline(row[cellIndex] ?? '')}</td>)}</tr>)}</tbody>
+        </table>
+      </div>,
+    );
+    tableRows = null;
+  };
 
   lines.forEach((line) => {
     if (line.startsWith('```')) {
-      flushParagraph(); flushList();
+      flushTable(); flushParagraph(); flushList();
       if (code) {
         blocks.push(<pre key={`code-${blocks.length}`} className="overflow-x-auto rounded-xl bg-[#111] p-4 text-sm leading-6 text-white"><code>{code.join('\n')}</code></pre>);
         code = null;
@@ -52,6 +66,17 @@ export function MarkdownContent({ source, className = '' }: { source: string; cl
       return;
     }
     if (code) { code.push(line); return; }
+    const trimmed = line.trim();
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+      flushParagraph(); flushList();
+      const cells = trimmed.slice(1, -1).split('|').map((cell) => cell.trim());
+      if (!cells.every((cell) => /^:?-{3,}:?$/.test(cell))) {
+        if (!tableRows) tableRows = [];
+        tableRows.push(cells);
+      }
+      return;
+    }
+    flushTable();
     const heading = line.match(/^(#{1,6})\s+(.+)$/);
     if (heading) {
       flushParagraph(); flushList();
@@ -87,7 +112,7 @@ export function MarkdownContent({ source, className = '' }: { source: string; cl
     if (/^---+$/.test(line.trim())) { flushParagraph(); flushList(); blocks.push(<hr key={`hr-${blocks.length}`} className="border-black/10" />); return; }
     paragraph.push(line.trim());
   });
-  flushParagraph(); flushList();
+  flushTable(); flushParagraph(); flushList();
   const trailingCode = code as string[] | null;
   if (trailingCode) blocks.push(<pre key={`code-${blocks.length}`} className="overflow-x-auto rounded-xl bg-[#111] p-4 text-sm leading-6 text-white"><code>{trailingCode.join('\n')}</code></pre>);
 

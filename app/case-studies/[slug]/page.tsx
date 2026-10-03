@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { absoluteSiteUrl, getPublishedCaseStudies } from '@/lib/content/data';
-import { imageSourceAndAlt } from '@/lib/content/markdown';
+import { imageSourceAndAlt, MarkdownContent } from '@/lib/content/markdown';
 
 export const revalidate = 300;
 const serviceLabels = { automation: 'Automation', chatbot: 'Chatbot', custom_software: 'Custom software' };
@@ -34,6 +34,7 @@ export default async function WorkDetailPage({ params }: { params: { slug: strin
       <h1 className="mt-3 text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">{study.project_title}</h1>
       {study.client_approved_public && study.client_name && <p className="mt-3 text-base text-subtle">For {study.client_name}</p>}
       <p className="mt-5 max-w-3xl text-lg leading-8 text-subtle">{study.summary}</p>
+      {study.project_overview && <section className="mt-12 border-t border-black/10 pt-8"><h2 className="mb-6 text-2xl font-semibold tracking-tight">Overview of the project</h2><MarkdownContent source={study.project_overview} className="text-subtle" /></section>}
       {study.problem && <section className="mt-12 grid gap-4 border-t border-black/10 pt-8 sm:grid-cols-[12rem_1fr] sm:gap-8"><h2 className="text-xl font-semibold tracking-tight">The problem</h2><p className="whitespace-pre-line text-base leading-7 text-subtle">{study.problem}</p></section>}
       {study.solution && <section className="mt-10 grid gap-4 border-t border-black/10 pt-8 sm:grid-cols-[12rem_1fr] sm:gap-8"><h2 className="text-xl font-semibold tracking-tight">What we built</h2><p className="whitespace-pre-line text-base leading-7 text-subtle">{study.solution}</p></section>}
       {study.screenshots.length > 0 && <div className="mt-8 grid gap-4 sm:grid-cols-2">{study.screenshots.map((value) => { const image = imageSourceAndAlt(value, study.project_title); return <div key={value} className="relative aspect-[4/3] overflow-hidden rounded-xl border border-black/10"><Image src={image.src} alt={image.alt} fill sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" className="object-cover" /></div>; })}</div>}

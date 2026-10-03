@@ -4,9 +4,10 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { deleteCaseStudy, saveCaseStudy } from '@/app/admin/case-studies/actions';
 import { ImageListUploadField } from '@/components/admin/ImageListUploadField';
+import { MarkdownEditor } from '@/components/admin/MarkdownEditor';
 import { SlugField } from '@/components/admin/SlugField';
 
-type Study = { id?: string; slug?: string; client_name?: string | null; project_title?: string; summary?: string; problem?: string; solution?: string; tech_used?: string[]; result?: string | null; testimonial_quote?: string | null; testimonial_author?: string | null; testimonial_role?: string | null; service_type?: string; screenshots?: string[]; client_approved_public?: boolean; status?: string; seo_title?: string | null; seo_description?: string | null };
+type Study = { id?: string; slug?: string; client_name?: string | null; project_title?: string; summary?: string; project_overview?: string; problem?: string; solution?: string; tech_used?: string[]; result?: string | null; testimonial_quote?: string | null; testimonial_author?: string | null; testimonial_role?: string | null; service_type?: string; screenshots?: string[]; client_approved_public?: boolean; status?: string; seo_title?: string | null; seo_description?: string | null };
 const control = 'mt-2 block min-w-0 w-full rounded-lg border border-black/10 bg-white px-3 py-2.5 text-sm outline-none focus:border-black';
 const errorText: Record<string, string> = { required: 'Complete the required fields before publishing.', approval: 'Client approval must be confirmed before publishing.', slug: 'That slug is already in use.', screenshots: 'The screenshot list is invalid.', save: 'Could not save the case study.', database: 'Database is unavailable.', delete: 'Could not delete the case study.' };
 
@@ -22,6 +23,7 @@ export function CaseStudyEditor({ study = {}, error = '', saved = false }: { stu
         <SlugField kind="case_studies" title={title} initialSlug={study.slug} excludeId={study.id} />
         <label className="text-sm font-medium">Client name<input name="client_name" maxLength={120} defaultValue={study.client_name ?? ''} className={control} /><span className="mt-1 block text-xs font-normal text-subtle">Shown publicly only after client approval is recorded.</span></label>
         <label className="text-sm font-medium md:col-span-2">One-line summary<input name="summary" required maxLength={300} defaultValue={study.summary ?? ''} className={control} /></label>
+        <div className="md:col-span-2"><MarkdownEditor name="project_overview" label="Overview of the project (Markdown)" defaultValue={study.project_overview ?? ''} /></div>
         <label className="text-sm font-medium">Service type<select name="service_type" required defaultValue={study.service_type ?? 'custom_software'} className={control}><option value="automation">Automation</option><option value="chatbot">Chatbot</option><option value="custom_software">Custom software</option></select></label>
         <label className="text-sm font-medium">Technologies, separated by commas<input name="tech_used" maxLength={300} defaultValue={study.tech_used?.join(', ') ?? ''} className={control} /></label>
         <label className="text-sm font-medium">The problem<textarea name="problem" rows={5} defaultValue={study.problem ?? ''} className={control} /></label>

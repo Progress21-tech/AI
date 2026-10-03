@@ -8,7 +8,7 @@ export type PostRecord = {
   seo_title: string | null; seo_description: string | null; created_at: string; updated_at: string;
 };
 export type CaseStudyRecord = {
-  id: string; slug: string; client_name: string | null; project_title: string; summary: string;
+  id: string; slug: string; client_name: string | null; project_title: string; summary: string; project_overview: string;
   problem: string; solution: string; tech_used: string[]; result: string | null;
   testimonial_quote: string | null; testimonial_author: string | null; testimonial_role: string | null;
   service_type: 'automation' | 'chatbot' | 'custom_software'; screenshots: string[];
