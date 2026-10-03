@@ -21,7 +21,9 @@ export function SectionRevealObserver() {
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -4% 0px' });
+    // Long article and case-study sections can be taller than the viewport,
+    // so they must reveal on first intersection instead of waiting for 12% visibility.
+    }, { threshold: 0, rootMargin: '0px 0px -4% 0px' });
     targets.forEach((element) => observer.observe(element));
 
     const showAll = (event: MediaQueryListEvent) => {

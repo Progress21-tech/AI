@@ -123,7 +123,6 @@ export default async function HomePage() {
                 <p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">{work.length ? 'Explore' : 'Coming soon'}</p>
                 <h3 className="mt-3 text-xl font-semibold tracking-tight">Case Studies</h3>
                 {work.length > 0 && <p className="mt-2 text-sm text-subtle">{work[0].project_title}</p>}
-                {work.length > 0 && <p className="mt-2 line-clamp-3 text-sm leading-6 text-subtle">{work[0].summary}</p>}
               </Link>
               <Link href="/blogs" className="rounded-2xl border border-black/10 bg-white p-6 transition hover:border-black/30">
                 <p className="text-xs font-semibold uppercase tracking-[.16em] text-subtle">{posts.length ? 'Explore' : 'Coming soon'}</p>
