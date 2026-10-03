@@ -47,6 +47,7 @@ main.public-site h6 {
   font-weight: var(--site-heading-weight);
   line-height: 1.02;
   letter-spacing: -0.025em;
+  color: var(--foreground);
 }
 
 /* Keep the mobile heading treatment; scale lower-level headings down on desktop. */
