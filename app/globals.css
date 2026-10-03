@@ -138,8 +138,16 @@ main.public-site p.text-xs { font-size: 0.6875rem; line-height: 1.4; }
 }
 
 .hero-image-placeholder img {
-  opacity: 0.58;
-  filter: grayscale(0.68);
+  opacity: 0.62;
+  filter: grayscale(1) contrast(0.82);
+}
+
+.hero-image-placeholder::after {
+  position: absolute;
+  inset: 0;
+  background: rgba(226, 226, 226, 0.28);
+  content: '';
+  pointer-events: none;
 }
 
 @media (min-width: 768px) {
