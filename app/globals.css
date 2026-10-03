@@ -85,6 +85,7 @@ main.public-site p:not(.text-xs) {
 }
 main.public-site p.text-lg { font-size: 1rem; }
 main.public-site p.text-xs { font-size: 0.6875rem; line-height: 1.4; }
+main.public-site strong { color: var(--foreground); font-weight: 700; }
 
 [data-reveal='pending'] {
   opacity: 0;

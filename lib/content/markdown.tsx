@@ -12,7 +12,7 @@ function inline(text: string): ReactNode[] {
   return parts.map((part, index) => {
     const key = `${index}-${part.slice(0, 12)}`;
     if (part.startsWith('`') && part.endsWith('`')) return <code key={key} className="rounded bg-surface px-1.5 py-0.5 font-mono text-[0.9em]">{part.slice(1, -1)}</code>;
-    if (part.startsWith('**') && part.endsWith('**')) return <strong key={key} className="font-semibold text-black">{part.slice(2, -2)}</strong>;
+    if (part.startsWith('**') && part.endsWith('**')) return <strong key={key}>{part.slice(2, -2)}</strong>;
     if (part.startsWith('*') && part.endsWith('*')) return <em key={key}>{part.slice(1, -1)}</em>;
     const link = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
     if (link) {
