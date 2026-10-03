@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { SiteHeader } from '@/components/site/SiteHeader';
@@ -28,6 +29,12 @@ const principles = [
   'You talk to the person building your system.',
 ];
 
+const heroImages = [
+  { src: '/images/home/hero-coding-workspace.png', alt: 'Coding workspace with a laptop and code editor' },
+  { src: '/images/home/hero-chatbot-assistant.png', alt: 'Customer chatting with an AI assistant' },
+  { src: '/images/home/hero-ai-automation.png', alt: 'AI assistant coordinating business automation tasks' },
+];
+
 export const revalidate = 300;
 
 export default async function HomePage() {
@@ -46,11 +53,15 @@ export default async function HomePage() {
             <Link href="/how-we-work" className="rounded-xl border border-black/15 px-5 py-3.5 text-sm font-semibold transition hover:border-black">See how we work</Link>
           </div>
           <p className="text-sm text-subtle md:col-start-1 md:row-start-3">Free 30-minute call. No commitment.</p>
-          <div className="hero-image-window mt-2 md:col-start-2 md:row-start-1 md:mt-0 md:self-stretch" role="img" aria-label="Three image placeholders scrolling from right to left">
+          <div className="hero-image-window mt-2 md:col-start-2 md:row-start-1 md:mt-0 md:self-stretch" role="img" aria-label="Coding workspace, chatbot assistant, and automation illustrations scrolling from right to left">
             <div className="hero-image-track" aria-hidden="true">
               {[0, 1].map((set) => (
                 <div key={set} className="hero-image-set">
-                  {[1, 2, 3].map((image) => <div key={image} className="hero-image-placeholder" />)}
+                  {heroImages.map((image, index) => (
+                    <div key={image.src} className="hero-image-placeholder">
+                      <Image src={image.src} alt={set === 0 ? image.alt : ''} fill sizes="(max-width: 767px) 70vw, 32vw" priority={set === 0 && index === 0} className="object-cover" />
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>

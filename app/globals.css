@@ -126,12 +126,15 @@ main.public-site p.text-xs { font-size: 0.6875rem; line-height: 1.4; }
 }
 
 .hero-image-placeholder {
-  width: clamp(12rem, 25vw, 19rem);
-  height: clamp(10rem, 38vw, 16rem);
+  position: relative;
+  width: auto;
+  height: clamp(14rem, 54vw, 21rem);
+  aspect-ratio: 4 / 5;
   flex: none;
   border: 1px solid rgba(0, 0, 0, 0.09);
   border-radius: 1.25rem;
-  background: linear-gradient(145deg, #f5f5f5, #ebebeb);
+  background: #f5f5f5;
+  overflow: hidden;
 }
 
 @media (min-width: 768px) {
